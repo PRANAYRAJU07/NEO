@@ -85,7 +85,18 @@ class TransformationManager {
 
   async process(photo: PhotoData, options: TransformationOptions): Promise<TransformationResult> {
     await this.initialize();
-    return this.activeProvider.transform(photo, options);
+    try {
+      return await this.activeProvider.transform(photo, options);
+    } catch (err) {
+      // If server inference fails (offline, connection error, timeout), smoothly fallback to offline provider
+      if (this.activeProvider.id === 'server-gpu') {
+        console.warn('Server GPU inference unavailable, falling back to offline provider:', err);
+        await this.mockProvider.initialize();
+        this.activeProvider = this.mockProvider;
+        return await this.mockProvider.transform(photo, options);
+      }
+      throw err;
+    }
   }
 
   releaseModelResources(): void {

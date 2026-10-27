@@ -97,12 +97,20 @@ export class ServerGpuProvider implements ITransformationProvider {
     imageSource: HTMLImageElement | ImageBitmap | PhotoData,
     options: TransformationOptions
   ): Promise<TransformationResult> {
+    if (options.abortSignal?.aborted) {
+      throw new Error('Transformation cancelled by user');
+    }
+
     this.cancelCurrentTransformation();
-    this.currentAbortController = new AbortController();
+    const controller = new AbortController();
+    this.currentAbortController = controller;
 
     // Link passed external abortSignal if present
     if (options.abortSignal) {
-      options.abortSignal.addEventListener('abort', () => this.cancelCurrentTransformation());
+      options.abortSignal.addEventListener('abort', () => {
+        controller.abort();
+        this.currentAbortController = null;
+      });
     }
 
     const { pathway, intensity, stage = 1, seed } = options;
@@ -127,7 +135,7 @@ export class ServerGpuProvider implements ITransformationProvider {
           Accept: 'application/json',
         },
         body: JSON.stringify(payload),
-        signal: this.currentAbortController.signal,
+        signal: controller.signal,
       });
 
       if (!res.ok) {

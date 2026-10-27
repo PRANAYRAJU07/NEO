@@ -147,6 +147,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         clearInterval(progressTimer);
         setProcessingProgress(100);
+        setEngineInfo(transformationManager.getEngineInfo());
+        setActiveProviderIdState(transformationManager.getActiveProvider().id);
 
         if (pathway === 'ice') {
           setIceResult(result);
