@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, CheckSquare, Square, ArrowRight, UserCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, CheckSquare, Square, ArrowRight, UserCheck, AlertTriangle, Server, Smartphone } from 'lucide-react';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useApp } from '../app/AppContext';
 import { APP_CONFIG } from '../config/appConfig';
@@ -21,6 +21,7 @@ export const Consent: React.FC = () => {
       agreedToPrivacy: true,
       acknowledgedEducationalOnly: true,
       confirmedAgeAppropriate: true,
+      agreedToServerProcessing: true,
       timestamp: Date.now(),
     });
     navigate('/selfie');
@@ -31,6 +32,7 @@ export const Consent: React.FC = () => {
       agreedToPrivacy: true,
       acknowledgedEducationalOnly: true,
       confirmedAgeAppropriate: true,
+      agreedToServerProcessing: false,
       timestamp: Date.now(),
     });
     navigate('/selfie?mode=sample');
@@ -48,14 +50,37 @@ export const Consent: React.FC = () => {
           Privacy Notice & Informed Choice
         </h1>
         <p className="text-sm text-slate-300 leading-relaxed">
-          Before taking or selecting a photo, please review how NEO protects your privacy and identity. Your trust and safety are paramount.
+          Before taking or selecting a photo, please review how NEO handles images during AI-assisted educational illustration. Your trust and safety are paramount.
         </p>
+      </div>
+
+      {/* Processing Architecture Disclosure */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-2">
+          <div className="flex items-center gap-2 text-sky-400 font-bold text-sm">
+            <Smartphone className="w-4 h-4" />
+            <span>Local On-Device Option</span>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Photos processed in offline mode or via demo avatars never leave your phone or laptop.
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 space-y-2">
+          <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
+            <Server className="w-4 h-4" />
+            <span>Private GPU Server Option</span>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            When connecting to the private AAIC GPU engine, images are processed strictly in volatile memory and destroyed immediately. No photos are stored on server disk.
+          </p>
+        </div>
       </div>
 
       {/* Privacy Notice Box */}
       <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
         <h2 className="text-base font-bold text-white flex items-center gap-2">
-          <span>How Your Photo Is Handled</span>
+          <span>Our Privacy Commitment</span>
         </h2>
         <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
           {APP_CONFIG.privacy.bullets.map((bullet, idx) => (
@@ -66,7 +91,7 @@ export const Consent: React.FC = () => {
           ))}
         </ul>
         <div className="pt-2 text-[11px] text-slate-500 border-t border-slate-800/80">
-          Note: This educational tool is designed to adhere to Australian privacy and youth digital safety principles. Formal legal compliance certification is subject to ongoing review by AAIC qualified advisors.
+          Note: Formal legal and child-safety compliance certification remains subject to ongoing review by AAIC qualified advisors.
         </div>
       </div>
 
@@ -103,7 +128,7 @@ export const Consent: React.FC = () => {
             )}
           </button>
           <span className="text-xs sm:text-sm text-slate-300 group-hover:text-slate-200 select-none">
-            I understand that my photo will be processed <strong>entirely on this device</strong> and will <strong>never be uploaded</strong> or stored.
+            I understand how my photo is handled: processed only in temporary memory and <strong>never permanently stored</strong> or linked to personal records.
           </span>
         </label>
 

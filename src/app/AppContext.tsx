@@ -6,6 +6,7 @@ import {
   TransformationResult,
   TransformationStage,
   EngineInfo,
+  FaceAnalysisResult,
 } from '../types';
 import { transformationManager } from '../services/transformation/transformationManager';
 import { imageCleanup } from '../services/imageCleanup';
@@ -20,6 +21,8 @@ interface AppContextType {
   setStage: (stage: TransformationStage) => void;
   intensity: number;
   setIntensity: (intensity: number) => void;
+  generationSeed?: number;
+  setGenerationSeed: (seed?: number) => void;
   iceResult: TransformationResult | null;
   healthyResult: TransformationResult | null;
   isProcessing: boolean;
@@ -27,7 +30,16 @@ interface AppContextType {
   error: string | null;
   clearError: () => void;
   engineInfo: EngineInfo;
-  processPathway: (pathway: TransformationPathway, stage?: TransformationStage, intensity?: number) => Promise<TransformationResult | null>;
+  activeProviderId: string;
+  setProviderId: (id: 'server-gpu' | 'mock-ai' | 'canvas-procedural') => void;
+  faceAnalysis: FaceAnalysisResult | null;
+  processPathway: (
+    pathway: TransformationPathway,
+    stage?: TransformationStage,
+    intensity?: number,
+    seed?: number
+  ) => Promise<TransformationResult | null>;
+  cancelTransformation: () => void;
   resetAll: () => void;
 }
 
@@ -38,6 +50,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [photo, setPhotoState] = useState<PhotoData | null>(null);
   const [currentStage, setStage] = useState<TransformationStage>(1);
   const [intensity, setIntensity] = useState<number>(0.85);
+  const [generationSeed, setGenerationSeed] = useState<number | undefined>(undefined);
+  const [faceAnalysis, setFaceAnalysis] = useState<FaceAnalysisResult | null>(null);
 
   const [iceResult, setIceResult] = useState<TransformationResult | null>(null);
   const [healthyResult, setHealthyResult] = useState<TransformationResult | null>(null);
@@ -46,16 +60,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [processingProgress, setProcessingProgress] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [engineInfo, setEngineInfo] = useState<EngineInfo>(() => transformationManager.getEngineInfo());
+  const [activeProviderId, setActiveProviderIdState] = useState<string>(() => transformationManager.getActiveProvider().id);
 
-  // Initialize engine on startup
+  // Initialize engine & provider on startup
   useEffect(() => {
     transformationManager.initialize().then(() => {
       setEngineInfo(transformationManager.getEngineInfo());
+      setActiveProviderIdState(transformationManager.getActiveProvider().id);
     });
   }, []);
 
   const setConsent = useCallback((newConsent: ConsentState) => {
     setConsentState(newConsent);
+  }, []);
+
+  const setProviderId = useCallback((id: 'server-gpu' | 'mock-ai' | 'canvas-procedural') => {
+    transformationManager.setProvider(id);
+    setActiveProviderIdState(id);
+    setEngineInfo(transformationManager.getEngineInfo());
   }, []);
 
   const setPhoto = useCallback((newPhoto: PhotoData) => {
@@ -67,6 +89,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIceResult(null);
     setHealthyResult(null);
     setError(null);
+
+    // Trigger face analysis in background
+    transformationManager.analyzeFace(newPhoto).then((analysis) => {
+      setFaceAnalysis(analysis);
+    }).catch(() => {
+      setFaceAnalysis(null);
+    });
   }, [photo]);
 
   const removePhoto = useCallback(() => {
@@ -76,15 +105,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPhotoState(null);
     setIceResult(null);
     setHealthyResult(null);
+    setFaceAnalysis(null);
   }, [photo]);
 
   const clearError = useCallback(() => setError(null), []);
+
+  const cancelTransformation = useCallback(() => {
+    transformationManager.cancelTransformation();
+    setIsProcessing(false);
+    setProcessingProgress(0);
+  }, []);
 
   const processPathway = useCallback(
     async (
       pathway: TransformationPathway,
       stage: TransformationStage = currentStage,
-      level: number = intensity
+      level: number = intensity,
+      seed: number | undefined = generationSeed
     ): Promise<TransformationResult | null> => {
       if (!photo) {
         setError('No photo selected. Please choose or capture a photo first.');
@@ -92,19 +129,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       setIsProcessing(true);
-      setProcessingProgress(15);
+      setProcessingProgress(20);
       setError(null);
 
       try {
-        // Simulate smooth progress for accessible user feedback
+        // Progress simulation for user feedback
         const progressTimer = setInterval(() => {
           setProcessingProgress((prev) => (prev < 85 ? prev + 15 : prev));
-        }, 80);
+        }, 120);
 
         const result = await transformationManager.process(photo, {
           pathway,
           intensity: level,
           stage,
+          seed,
         });
 
         clearInterval(progressTimer);
@@ -119,7 +157,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return result;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Transformation processing error';
-        setError(message);
+        if (!message.includes('cancelled')) {
+          setError(message);
+        }
         return null;
       } finally {
         setTimeout(() => {
@@ -128,22 +168,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }, 200);
       }
     },
-    [photo, currentStage, intensity]
+    [photo, currentStage, intensity, generationSeed]
   );
 
   const resetAll = useCallback(() => {
+    transformationManager.releaseModelResources();
     imageCleanup.fullCleanup();
-    transformationManager.release();
     setPhotoState(null);
     setConsentState(null);
     setIceResult(null);
     setHealthyResult(null);
+    setFaceAnalysis(null);
     setError(null);
     setIsProcessing(false);
     setProcessingProgress(0);
     setStage(1);
     setIntensity(0.85);
+    setGenerationSeed(undefined);
     setEngineInfo(transformationManager.getEngineInfo());
+    setActiveProviderIdState(transformationManager.getActiveProvider().id);
   }, []);
 
   return (
@@ -158,6 +201,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setStage,
         intensity,
         setIntensity,
+        generationSeed,
+        setGenerationSeed,
         iceResult,
         healthyResult,
         isProcessing,
@@ -165,7 +210,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         error,
         clearError,
         engineInfo,
+        activeProviderId,
+        setProviderId,
+        faceAnalysis,
         processPathway,
+        cancelTransformation,
         resetAll,
       }}
     >

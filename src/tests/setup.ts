@@ -59,6 +59,10 @@ HTMLCanvasElement.prototype.toBlob = vi.fn((callback: BlobCallback, type = 'imag
   setTimeout(() => callback(mockBlob), 0);
 });
 
+HTMLCanvasElement.prototype.toDataURL = vi.fn((_type = 'image/jpeg') => {
+  return 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD...';
+});
+
 // Mock Image loading
 class MockImage {
   src = '';
@@ -94,3 +98,52 @@ Object.defineProperty(navigator, 'mediaDevices', {
   configurable: true,
   writable: true,
 });
+
+// Mock fetch for fast unit testing
+const originalFetch = global.fetch;
+global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+  const url = typeof input === 'string' ? input : input.toString();
+
+  // If testing offline host
+  if (url.includes('nonexistent-host')) {
+    throw new Error('Failed to fetch');
+  }
+
+  if (url.includes('/api/v1/health')) {
+    return new Response(JSON.stringify({ status: 'healthy', service: 'NEO-AI' }), { status: 200 });
+  }
+
+  if (url.includes('/api/v1/model-status')) {
+    return new Response(JSON.stringify({
+      status: 'cpu_fallback',
+      model_name: 'stabilityai/stable-diffusion-xl-base-1.0',
+      device: 'cpu',
+      cuda_available: false,
+      supported_stages: [1, 2, 3],
+      supported_pathways: ['ice', 'healthy'],
+    }), { status: 200 });
+  }
+
+  if (url.includes('/api/v1/transform')) {
+    return new Response(JSON.stringify({
+      success: true,
+      image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
+      model: 'stabilityai/stable-diffusion-xl-base-1.0',
+      pathway: 'ice',
+      stage: 1,
+      intensity: 0.85,
+      effective_strength: 0.33,
+      seed: 42,
+      prompt_used: 'documentary portrait',
+      negative_prompt_used: 'horror, gore',
+      execution_time_ms: 85,
+      is_live_gpu_inference: false,
+    }), { status: 200 });
+  }
+
+  if (originalFetch) {
+    return originalFetch(input, init);
+  }
+
+  return new Response(JSON.stringify({ status: 'ok' }), { status: 200 });
+}) as unknown as typeof fetch;

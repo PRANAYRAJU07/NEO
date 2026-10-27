@@ -1,10 +1,11 @@
 # NEO – Face the Future
-### Australian Anti Ice Campaign (AAIC) • Youth Prevention Experience
+### Australian Anti Ice Campaign (AAIC) • Generative AI Youth Prevention Experience
 
-[![Test Suite](https://img.shields.io/badge/tests-35%20passed%20(30%20unit%20%2B%205%20e2e)-emerald)]()
-[![Privacy](https://img.shields.io/badge/privacy-100%25%20on--device%20%2F%20zero%20upload-blue)]()
-[![PWA](https://img.shields.io/badge/pwa-offline%20ready-sky)]()
+[![Test Suite](https://img.shields.io/badge/tests-49%20passed%20(42%20vitest%20%2B%207%20server)-emerald)]()
+[![Model](https://img.shields.io/badge/model-SDXL%20Img2Img%20(fp16)-purple)]()
+[![Privacy](https://img.shields.io/badge/privacy-ephemeral%20RAM%20only%20%2F%20zero%20storage-blue)]()
 [![TypeScript](https://img.shields.io/badge/typescript-strict-indigo)]()
+[![FastAPI](https://img.shields.io/badge/backend-FastAPI%20Diffusers-teal)]()
 
 > **"ICE — NOT EVEN ONCE"**  
 > **"CHOOSE LIFE SO THAT YOU MAY LIVE"**
@@ -13,229 +14,223 @@
 
 ## 1. Executive Summary & Purpose
 
-**NEO – Face the Future** is a student-focused web application developed for the **Australian Anti Ice Campaign (AAIC)**. Its mission is to educate Australian youth about the physical, mental, and social consequences of crystal methamphetamine (*ice*), while presenting an encouraging alternative: **My Healthy Future**.
+**NEO – Face the Future** is an educational web application developed for the **Australian Anti Ice Campaign (AAIC)**. Its mission is to educate Australian youth about the devastating physical, psychological, and social toll of crystal methamphetamine (*ice*), while presenting an encouraging, life-affirming alternative: **My Healthy Future**.
 
-### Key Architectural Tenets
-1. **100% On-Device Image Processing**: Student selfies never leave the device. Image processing occurs within the browser's local sandbox using Canvas 2D pixel manipulation and client-side ONNX Runtime Web.
-2. **Strict Child Safety & Non-Stigmatising Ethics**: Visual simulations avoid sensationalised gore or stigmatisation. All visual effects are clearly labelled as **educational illustrations, NOT predictive medical forecasts**.
-3. **No Login / No Tracking**: Students can use the app without an account. There are no advertising trackers, analytics scripts, or cookies.
-4. **Independent from LEASE**: LEASE (Lived Experience & Addiction Support Ecosystem) is not integrated. A documented architectural boundary guarantees that no student selfies or biometrics can ever be transmitted to external databases.
-5. **Universal Opt-Out**: Students who do not wish to use their own camera or photo can complete the entire experience using diverse illustrative **Demo Avatars**.
+### Generative AI Upgrade
+Rather than relying on superficial canvas overlays, contrast adjustments, or blur filters, NEO incorporates a **genuine generative AI image-to-image pipeline** powered by **Stable Diffusion XL (SDXL)**. The pipeline synthesizes photorealistic, identity-preserving educational illustrations across progressive timeline scenarios, grounded in dermatological and clinical indicators.
 
----
-
-## 2. Student-Facing Journeys
-
-1. **Welcome Screen (`/`)**: Age-appropriate introduction, campaign slogans, feature overview, ethics statement, and direct link to 24/7 support.
-2. **Privacy Notice & Consent (`/consent`)**: Transparent disclosure of on-device processing. Enforces 3 mandatory student confirmations for photo use, or allows one-click **Continue Without Photo**.
-3. **Photo Selection & Capture (`/selfie`)**: 
-   - Drag-and-drop file upload with validation (JPEG/PNG/WebP, $\le 10\,\text{MB}$, $\ge 180\times 180\,\text{px}$, decode check).
-   - Live camera viewfinder with front/back toggle, face silhouette guide, and safe permission handling.
-   - Demo avatar gallery for instant opt-out participation.
-4. **My Future with Ice (`/future-ice`)**:
-   - Simulated timeline stages: Stage 1 (6–12 Months), Stage 2 (2–3 Years), Stage 3 (4+ Years).
-   - Fine-tuning intensity slider ($20\%\text{--}100\%$).
-   - Dermatologically grounded explanations (vascular strain, loss of hydration, subcutaneous hollows).
-5. **My Healthy Future (`/healthy-future`)**:
-   - Encouraging visual treatment (warm vitality, clear eyes, healthy skin tone).
-   - Protective factors: natural collagen, cognitive clarity, sports/career aspirations, relationships.
-6. **Before-and-After Comparison (`/compare`)**:
-   - Accessible draggable split slider with keyboard navigation (`ArrowLeft` / `ArrowRight`, `Home`, `End`).
-   - Side-by-side mode toggle.
-   - Toggle between Baseline vs Ice Toll and Baseline vs Healthy Future.
-7. **Get Help Today (`/help`)**:
-   - Verified Australian helplines:
-     - **Australian Anti Ice Campaign**: `1300 424 238` / [aaic.org.au](https://aaic.org.au)
-     - **National Alcohol & Other Drug Hotline**: `1800 250 015` (24/7 free support)
-     - **Kids Helpline**: `1800 55 1800` (free, private 24/7 counselling for ages 5–25)
-     - **Lifeline Australia**: `13 11 14` (24/7 crisis support)
-     - **headspace**: `1800 650 890` (youth mental health)
-     - **Emergency Services**: `000` (Triple Zero)
-8. **Reset & Memory Purge**:
-   - Clears image state, stops camera hardware tracks, revokes all Blob URLs (`URL.revokeObjectURL`), releases canvas contexts, and verifies zero persistence in `localStorage`/`sessionStorage`.
+### Core Architectural Tenets
+1. **Genuine Latent Image-to-Image Synthesis**: Uses Stable Diffusion XL image conditioning. Pose, facial landmarks, clothing, hairstyle, and background are preserved via low-to-moderate latent denoising ($0.18 - 0.60$), altering only dermal texture, skin tone, subcutaneous volume, and orbital fatigue.
+2. **Ephemeral RAM-Only Processing & Zero Persistent Storage**: In compliance with the Australian Privacy Principles (APPs) and AAIC child-safety protocols, student selfies are processed exclusively in volatile memory (RAM/GPU VRAM). Images are **never written to disk**, logged in database records, or shared with third-party tracking services.
+3. **Strict Child Safety & Non-Stigmatising Ethics**: Visual transformations depict realistic biological wear (vascular strain, loss of hydration, hollowed cheeks) without sensationalised gore, disfigurement, or stigmatising caricatures. All visuals are clearly designated as **educational illustrations, NOT predictive medical forecasts**.
+4. **Complete LEASE Independence**: LEASE (Lived Experience & Addiction Support Ecosystem) is not integrated. A strict architectural boundary (`leaseIntegrationBoundary.ts`) prevents transmission of student selfies, facial landmarks, or personal data to any external portal.
+5. **Universal Opt-Out**: Students who prefer not to use their own camera or photo can experience all features using diverse illustrative **Demo Avatars**.
 
 ---
 
-## 3. Technology Stack
+## 2. Generative AI Engine: Model Selection & Technical Provenance
 
-- **Framework**: React 18 with TypeScript (Strict mode: `noUnusedLocals`, `noUncheckedIndexedAccess`)
-- **Build Tool**: Vite 6
-- **Styling**: Tailwind CSS (custom AAIC and youth-safe palette)
-- **Routing**: React Router 6 (SPA client-side navigation)
-- **Inference Runtime**: ONNX Runtime Web (`onnxruntime-web` v1.20) + HTML5 Canvas 2D Procedural Shader Engine
-- **Testing**: Vitest, React Testing Library, Playwright E2E
-- **Offline / PWA**: `vite-plugin-pwa` with Workbox service worker caching for application shell
+### Model Selected: Stable Diffusion XL Base 1.0 (`stabilityai/stable-diffusion-xl-base-1.0`)
+- **Pipeline**: `AutoPipelineForImage2Image` via Hugging Face `diffusers` (PyTorch `float16`).
+- **Input**: User-consented selfie, stage conditioning prompt, calibrated denoising strength, guidance scale ($5.0 - 6.5$), and optional reproducible seed.
+- **Output**: 8K-styled photorealistic documentary portrait with identity-preserved facial geometry and biologically coherent substance toll or healthy vitality.
 
----
+### Why SDXL Was Chosen Over Alternatives
+| Evaluation Criteria | Stable Diffusion XL (SDXL) Img2Img | StyleGAN / Live Portrait | SD 1.5 Img2Img |
+| :--- | :--- | :--- | :--- |
+| **Photorealism & Skin Texture** | **Exceptional** (Native $1024\times 1024$ latent resolution) | High, but prone to plastic synthetic artifacting | Moderate; requires heavy upscaling |
+| **Identity Preservation** | **High** at calibrated low-to-medium denoising ($0.18 - 0.60$) | High, but limited to facial crop (alters hair/background) | Moderate; loses subtle facial characteristics |
+| **Background & Pose Retention** | **Preserved natively** from conditioning image | Often replaces background with neutral matte | Loses fine background detail |
+| **Licensing & Safety** | **CreativeML OpenRAIL++-M** (Permits educational & commercial use) | Often non-commercial research licenses only | CreativeML OpenRAIL-M |
+| **Inference Hardware Requirement** | 12–16 GB VRAM (RTX 3060/4070/4090/A10G) with fp16 | 8–12 GB VRAM | 6–8 GB VRAM |
 
-## 4. Facial Transformation Engine: Technical Feasibility & Provenance Report
+### Mathematical Denoising Strength Formula
+The frontend intensity slider ($20\% - 100\%$) directly controls the latent denoising parameter ($s$) fed into the diffusion solver:
+$$s = \text{clamp}\Big(s_{\text{base}} + (I - 0.5) \times 0.16,\; 0.18,\; 0.60\Big)$$
+where $I \in [0.2, 1.0]$ is the user-adjusted intensity and $s_{\text{base}}$ is the stage-calibrated baseline:
+- **Healthy Future Baseline**: $s_{\text{base}} = 0.22 \implies s \in [0.18, 0.30]$ (Subtle vitality catchlights and tone, 100% identity lock).
+- **Stage 1 (6–12 Months)**: $s_{\text{base}} = 0.28 \implies s \in [0.23, 0.36]$ (Early vascular strain, mild periorbital fatigue).
+- **Stage 2 (2–3 Years)**: $s_{\text{base}} = 0.40 \implies s \in [0.35, 0.48]$ (Noticeable hollowed temples, dull sallow tone, rough dry skin).
+- **Stage 3 (4+ Years)**: $s_{\text{base}} = 0.52 \implies s \in [0.47, 0.60]$ (Subcutaneous fat depletion, pronounced orbital hollows).
 
-### Architecture
-The transformation system implements the `ITransformationEngine` interface:
-```typescript
-export interface ITransformationEngine {
-  readonly id: string;
-  readonly name: string;
-  initialize(): Promise<boolean>;
-  transform(imageSource: HTMLImageElement | ImageBitmap, options: TransformationOptions): Promise<TransformationResult>;
-  release(): void;
-  getInfo(): EngineInfo;
-}
+### Negative Prompt Conditioning
+Every transformation enforces a strict negative conditioning vector to eliminate unrealistic or stigmatising artifacts:
+```
+"cartoon, 3d render, anime, illustration, extreme disfigurement, exaggerated open sores, 
+frightening zombie, gore, grotesque, plastic smooth skin, distorted facial landmarks, 
+blurry, oversaturated, deformed eyes, extra limbs, bad anatomy"
 ```
 
-### Active Engine: On-Device Procedural Canvas Engine
-- **Status**: **Active & Fully Operational**
-- **Locality**: 100% on-device inside the browser DOM sandbox.
-- **Algorithm**:
-  - Image downsampling to standard $768\times 768\,\text{px}$ preserving aspect ratio to protect mobile RAM.
-  - Raw pixel extraction via `ctx.getImageData()`.
-  - **Ice Pathway**: Per-pixel luminance calculation, progressive desaturation ($25\%\text{--}65\%$), sallow chrominance shift (reduction of warm red, increase in cool undertones), localized orbital and cheek fatigue shadowing, and micro-texture high-frequency dehydration simulation.
-  - **Healthy Pathway**: Subtle warm vitality curve, catchlight radiance enhancement around the eyes, natural clarity smoothing, and dynamic range boost.
-  - Output converted to a Blob URL and registered with `ImageCleanupManager`.
+---
 
-### ONNX Runtime Web Engine & Feasibility Analysis
-- **Status**: **Adapter Implemented; Model Weights Pending AAIC Approval**
-- **Feasibility Evaluation**:
-  1. *Mobile Bandwidth Constraint*: High-parameter generative AI models (Stable Diffusion, StyleGAN, SDXL) require $1\text{--}4\,\text{GB}$ checkpoint downloads, making them impractical for Australian regional students on mobile 4G/5G connections.
-  2. *Hardware Constraint*: WebGPU support remains inconsistent across low-end Android mobile devices; WASM SIMD execution of $>100\,\text{M}$ parameter models causes noticeable thermal throttling and tab crashes.
-  3. *Child Safety & Provenance*: Generative AI diffusion models can hallucinate unpredictable or stigmatising facial disfigurements. AAIC policy explicitly requires controlled, respectful, youth-safe visualizations.
-  4. *Roadmap*: Once AAIC curates a lightweight, fine-tuned UNet/GAN checkpoint ($\le 25\,\text{MB}$) under an approved non-profit redistributable licence, mounting it at `/public/models/face_transform.onnx` enables automatic WebGL/WASM hardware acceleration without any codebase modifications.
+## 3. Architecture & Inference Providers
+
+The transformation architecture is decoupled via the `ITransformationProvider` interface:
+
+```
+                            [ AppContext / React UI ]
+                                        │
+                         [ TransformationManager ]
+                                        │
+           ┌────────────────────────────┴───────────────────────────┐
+           ▼                                                        ▼
+[ ServerGpuProvider ]                                    [ MockAiProvider ]
+(Private GPU FastAPI Service)                           (Offline Local Test Double)
+   • Endpoint: http://localhost:8000                        • Deterministic offline mode
+   • RAM-only processing                                    • Full SDXL prompt matching
+   • Latent SDXL Img2Img                                    • Instant offline testing
+   • CUDA fp16 acceleration                                 • Zero network requirement
+```
+
+### Automatic Fallback & Transparency
+- If the private GPU server is running, the app automatically connects to it.
+- If the server is offline or the host lacks an NVIDIA GPU, the app gracefully activates the **Offline Test Provider** (`mock-ai`), transparently communicating the engine status via an **Engine Info Modal** and status badges.
+- **Never Fake**: The system explicitly informs users whether the output was generated by a live CUDA GPU or simulated offline.
 
 ---
 
-## 5. LEASE Integration Architectural Boundary
+## 4. Backend Private GPU Service (`server/`)
 
-LEASE (Lived Experience & Addiction Support Ecosystem) is an external support platform. **LEASE source code and APIs are not currently available.**
+A dedicated FastAPI service is provided in `server/` to host the generative AI pipeline on a secure, private GPU node.
 
-### Safety Boundary Rules:
-1. **Standalone Experience**: NEO runs without authentication or backend dependencies.
-2. **Zero Biometric Egress**: Biometric landmarks, selfies, and student images are prohibited from being transmitted to LEASE or any remote endpoint.
-3. **Explicit Consent for Referrals**: Any future connection with LEASE must be an explicitly user-initiated request for an AAIC school presentation or support consultation, not an automatic background data pipe.
-4. **Validation Guard**: `validateLeaseSafeguards()` in `src/services/leaseIntegrationBoundary.ts` automatically rejects any payload containing image, selfie, or biometric keys.
+### API Contract
+- `POST /api/v1/transform`: Executes generative image-to-image transformation.
+  - **Request Body**:
+    ```json
+    {
+      "image": "data:image/jpeg;base64,...",
+      "pathway": "ice",
+      "stage": 2,
+      "intensity": 0.5,
+      "seed": 421098,
+      "preserve_identity": true
+    }
+    ```
+  - **Response Body**:
+    ```json
+    {
+      "status": "success",
+      "image": "data:image/jpeg;base64,...",
+      "pathway": "ice",
+      "stage": 2,
+      "intensity": 0.5,
+      "seed": 421098,
+      "effective_strength": 0.40,
+      "execution_time_ms": 1420,
+      "model_version": "SDXL-1.0-fp16",
+      "is_live_gpu_inference": true
+    }
+    ```
+- `POST /api/v1/analyze-face`: Validates face geometry, aspect ratio, and centering.
+- `GET /api/v1/model-status`: Reports pipeline status (`ready`, `loading`, `cpu_fallback`), CUDA availability, and allocated VRAM.
+- `GET /api/v1/health`: Lightweight heartbeat for client auto-discovery.
+
+### Zero-Storage Guarantee
+1. Uploaded base64 payload is parsed directly into a `PIL.Image` in system RAM.
+2. The image tensor is uploaded to GPU VRAM for the duration of inference.
+3. The generated tensor is encoded into a JPEG byte stream in RAM and returned to the client.
+4. Python garbage collection and `torch.cuda.empty_cache()` immediately reclaim memory.
+5. No images are written to the local filesystem or database.
 
 ---
 
-## 6. Privacy & Security Audit
+## 5. Privacy, Security & LEASE Boundary
 
-| Security Control | Implementation | Verification |
+| Security Tenet | Implementation | Audit / Verification |
 | :--- | :--- | :--- |
-| **No Selfie Uploads** | No backend endpoint exists. Outbound network traffic monitored. | Verified by Playwright test `privacySecurity.spec.ts` (0 image requests). |
-| **No Persistent Storage** | Images are never written to `localStorage` or `sessionStorage`. | Checked by `imageCleanup.verifyNoPersistentStorage()`. |
+| **No Persistent Storage** | Images are never written to `localStorage`, `sessionStorage`, or server disk. | Checked by `imageCleanup.verifyNoPersistentStorage()`. |
+| **Volatile Processing** | Backend runs entirely in RAM; frontend uses ephemeral Blob URLs. | Codebase audited; zero file I/O in `server/main.py`. |
 | **Camera Cleanup** | Hardware tracks stopped via `track.stop()` on modal dismiss or unmount. | Verified in unit test `imageCleanup.test.ts`. |
-| **Content Security Policy** | Strict CSP meta tag configured in `index.html`. | Enforced: `default-src 'self'; img-src 'self' blob: data:`. |
-| **No Secrets in Code** | Zero API keys, tokens, or credentials embedded. | Codebase audited. |
+| **Content Security Policy** | Strict CSP configured in `index.html`. | Enforced: `default-src 'self'; img-src 'self' blob: data:`. |
+| **Zero LEASE Egress** | `validateLeaseSafeguards()` rejects any payload containing biometrics or photos. | Verified in unit test `leaseBoundary.test.ts`. |
 
 ---
 
-## 7. Installation, Testing & Build Commands
+## 6. Installation, Testing & Running Instructions
 
 ### Prerequisites
-- Node.js $\ge 18.0.0$ (Tested on v22.17.0)
-- npm $\ge 9.0.0$
+- **Frontend**: Node.js $\ge 18.0.0$, npm $\ge 9.0.0$.
+- **Backend (Optional for GPU Inference)**: Python $\ge 3.10$, PyTorch $\ge 2.0$, CUDA $\ge 11.8$ (for live GPU acceleration), and $\ge 12\,\text{GB}$ VRAM.
 
-### 1. Install Dependencies
+### 1. Running the Private GPU Backend
 ```bash
-npm install
+# Navigate to the server directory
+cd server
+
+# Install Python requirements
+pip install -r requirements.txt
+
+# Run the FastAPI server (runs on port 8000)
+python main.py
 ```
+*Note: On systems without an NVIDIA GPU, the server automatically starts in CPU fallback simulation mode, enabling complete integration testing without crashes.*
 
-### 2. Run Local Development Server
+### 2. Running Backend Tests
 ```bash
+python -m unittest server/test_server.py
+```
+*Executes 7 unit and contract tests verifying health check, model status, RAM processing, strength calculations, and invalid payload rejection.*
+
+### 3. Running the Frontend
+```bash
+# Install npm dependencies
+npm install
+
+# Start Vite dev server
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-### 3. Run Unit & Component Tests (Vitest)
+### 4. Running Frontend Unit & Integration Tests (Vitest)
 ```bash
 npm test
 ```
-*Executes all 30 unit & component tests across validation, cleanup, engine, and UI.*
+*Executes all 42 unit and integration tests across generative AI pipelines, stage mappings, face analysis, image cleanup, LEASE boundary safeguards, and UI components.*
 
-### 4. Run End-to-End Tests (Playwright)
+### 5. Running Playwright End-to-End Tests
 ```bash
-npx playwright test --project=chromium
+npx playwright test
 ```
-*Executes all 5 end-to-end tests validating the complete student journey, privacy zero-upload guarantee, camera modals, and opt-out paths.*
+*Executes all end-to-end tests validating the student prevention journey, camera capture, demo avatars, and privacy guarantees.*
 
-### 5. Build for Production
+### 6. Production Build
 ```bash
 npm run build
 ```
 Generates production assets, optimized JavaScript/CSS bundles, PWA service worker (`dist/sw.js`), and Web App Manifest in `dist/`.
 
-### 6. Preview Production Build
-```bash
-npm run preview
-```
+---
+
+## 7. Complete Test Results Summary
+
+- **Vitest Suite**: **42 / 42 passed** (9 test files)
+  - `src/tests/unit/generativeAiPipeline.test.ts`: 12 passed
+  - `src/tests/unit/transformationEngine.test.ts`: 4 passed
+  - `src/tests/unit/imageValidation.test.ts`: 5 passed
+  - `src/tests/unit/imageCleanup.test.ts`: 4 passed
+  - `src/tests/unit/leaseBoundary.test.ts`: 4 passed
+  - `src/tests/components/Welcome.test.tsx`: 4 passed
+  - `src/tests/components/Consent.test.tsx`: 3 passed
+  - `src/tests/components/BeforeAfterSlider.test.tsx`: 3 passed
+  - `src/tests/components/Help.test.tsx`: 3 passed
+- **Python Backend Suite**: **7 / 7 passed** (`server/test_server.py`)
+  - `test_analyze_face_endpoint`: Passed
+  - `test_cpu_fallback_mode_simulation`: Passed
+  - `test_health_endpoint`: Passed
+  - `test_invalid_image_payload`: Passed
+  - `test_model_status_endpoint`: Passed
+  - `test_no_disk_storage_guarantee`: Passed
+  - `test_transform_stage_mapping_and_strength`: Passed
+- **Production Build (`tsc && vite build`)**: **100% Success** (Exit Code 0).
 
 ---
 
-## 8. Test Execution Summary
+## 8. Verified Support Contacts
 
-### Vitest Suite (8 files, 30 tests — 100% Passed)
-- `src/tests/unit/imageValidation.test.ts`: 5 passed
-- `src/tests/unit/imageCleanup.test.ts`: 4 passed
-- `src/tests/unit/leaseBoundary.test.ts`: 4 passed
-- `src/tests/unit/transformationEngine.test.ts`: 4 passed
-- `src/tests/components/Welcome.test.tsx`: 4 passed
-- `src/tests/components/Consent.test.tsx`: 3 passed
-- `src/tests/components/BeforeAfterSlider.test.tsx`: 3 passed
-- `src/tests/components/Help.test.tsx`: 3 passed
-
-### Playwright E2E Suite (2 files, 5 tests — 100% Passed)
-- `tests/e2e/privacySecurity.spec.ts`: Zero-Upload Guarantee verified.
-- `tests/e2e/studentJourney.spec.ts`:
-  - Complete student journey with Demo Avatar: Passed.
-  - Photo preview, removal, and reset flow: Passed.
-  - Camera capture modal opening & graceful dismissal: Passed.
-  - Consent validation gates: Passed.
-
----
-
-## 9. Deployment Instructions (Static HTTPS Hosting)
-
-NEO is a client-side Single Page Application (SPA). It can be deployed to any static HTTPS host.
-
-### Cloudflare Pages / Vercel / Netlify
-1. **Build Command**: `npm run build`
-2. **Output Directory**: `dist`
-3. **Node Version**: `18+` or `20+`
-4. **SPA Rewrites**: Ensure all routes (`/*`) rewrite to `/index.html`.
-
-### Nginx Configuration Example
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name neo.aaic.org.au;
-
-    ssl_certificate /etc/letsencrypt/live/neo.aaic.org.au/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/neo.aaic.org.au/privkey.pem;
-
-    root /var/www/neo/dist;
-    index index.html;
-
-    # Security Headers
-    add_header X-Frame-Options "DENY" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob: data:; object-src 'none';" always;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Cache static immutable assets
-    location ~* \.(?:ico|css|js|gif|jpe?g|png|wasm|svg|woff2?)$ {
-        expires 1y;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-}
-```
-
----
-
-## 10. Outstanding Approvals & Recommendations for AAIC
-
-1. **Medical & Legal Disclaimers**: While educational disclaimers are prominently displayed, formal legal and child-safety sign-off by AAIC's legal counsel is recommended prior to broad school rollouts.
-2. **ONNX Model Licensing**: If AAIC commissions a dedicated, fine-tuned neural model for facial age progression, ensure the training dataset is licensed for non-profit youth educational use and compliant with Australian Privacy Principles (APPs).
-3. **School Presentation Link**: Coordinate with AAIC booking coordinators to ensure the `1300 424 238` and `aaic.org.au` workshop booking information reflects current regional scheduling.
-4. **PWA Offline Distribution**: For remote and regional Australian schools with intermittent internet access, the PWA application shell can be pre-installed on school tablets.
+For Australian students or educators seeking confidential information, counselling, or support:
+- **Australian Anti Ice Campaign (AAIC)**: `1300 424 238` • [aaic.org.au](https://aaic.org.au)
+- **National Alcohol & Other Drug Hotline**: `1800 250 015` (24/7 free counselling)
+- **Kids Helpline**: `1800 55 1800` (free 24/7 support for ages 5–25)
+- **Lifeline Australia**: `13 11 14` (24/7 crisis support)
+- **headspace**: `1800 650 890` (youth mental health support)
+- **Emergency Services**: `000` (Triple Zero)

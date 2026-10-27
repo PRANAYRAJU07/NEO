@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   AlertTriangle,
   Sliders,
   SplitSquareVertical,
+  Dices,
+  Cpu,
+  Info,
 } from 'lucide-react';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { EducationalDisclaimer } from '../components/EducationalDisclaimer';
@@ -13,6 +16,7 @@ import { ErrorState } from '../components/ErrorState';
 import { useApp } from '../app/AppContext';
 import { APP_CONFIG } from '../config/appConfig';
 import { TransformationStage } from '../types';
+import { calculateEffectiveStrength, STAGE_PROFILES } from '../services/transformation/promptProfiles';
 
 export const FutureIce: React.FC = () => {
   const navigate = useNavigate();
@@ -26,9 +30,23 @@ export const FutureIce: React.FC = () => {
     setStage,
     intensity,
     setIntensity,
+    generationSeed,
+    setGenerationSeed,
+    engineInfo,
+    activeProviderId,
+    setProviderId,
     processPathway,
+    cancelTransformation,
     clearError,
   } = useApp();
+
+  const [sliderVal, setSliderVal] = useState<number>(intensity);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync sliderVal with global intensity
+  useEffect(() => {
+    setSliderVal(intensity);
+  }, [intensity]);
 
   // If no photo is selected, prompt user to pick one
   useEffect(() => {
@@ -37,29 +55,48 @@ export const FutureIce: React.FC = () => {
       return;
     }
 
-    // Automatically generate transformation if not already present
+    // Automatically trigger initial generation if not present
     if (!iceResult && !isProcessing) {
-      processPathway('ice', currentStage, intensity);
+      processPathway('ice', currentStage, intensity, generationSeed);
     }
-  }, [photo, iceResult, isProcessing, currentStage, intensity, navigate, processPathway]);
+  }, [photo, iceResult, isProcessing, currentStage, intensity, generationSeed, navigate, processPathway]);
 
   const handleStageChange = (stage: TransformationStage) => {
     setStage(stage);
-    processPathway('ice', stage, intensity);
+    processPathway('ice', stage, sliderVal, generationSeed);
   };
 
-  const handleIntensityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newIntensity = parseFloat(e.target.value);
-    setIntensity(newIntensity);
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setSliderVal(val);
+
+    // Debounce regeneration
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setIntensity(val);
+      processPathway('ice', currentStage, val, generationSeed);
+    }, 400);
   };
 
-  const handleIntensityRelease = () => {
-    processPathway('ice', currentStage, intensity);
+  const handleRerollSeed = () => {
+    const newSeed = Math.floor(Math.random() * 900000) + 100000;
+    setGenerationSeed(newSeed);
+    processPathway('ice', currentStage, sliderVal, newSeed);
+  };
+
+  const handleProviderToggle = () => {
+    const nextProvider = activeProviderId === 'server-gpu' ? 'mock-ai' : 'server-gpu';
+    setProviderId(nextProvider);
+    processPathway('ice', currentStage, sliderVal, generationSeed);
   };
 
   if (!photo) return null;
 
   const currentStageMeta = APP_CONFIG.stages.find((s) => s.stage === currentStage) || APP_CONFIG.stages[0]!;
+  const effectiveStrength = calculateEffectiveStrength('ice', currentStage, sliderVal);
+  const activeProfile = STAGE_PROFILES.ice[currentStage] || STAGE_PROFILES.ice[1]!;
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-10 space-y-8 animate-fade-in">
@@ -67,29 +104,69 @@ export const FutureIce: React.FC = () => {
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-semibold">
           <AlertTriangle className="w-3.5 h-3.5" />
-          <span>Educational Substance Toll Exploration</span>
+          <span>Generative AI Substance Toll Simulation</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
           My Future with Ice (Simulated)
         </h1>
         <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-          A respectful, evidence-grounded visual simulation demonstrating how crystal methamphetamine impacts systemic hydration, vascular tone, and facial vitality over time.
+          Stage-conditioned generative AI illustration demonstrating the cumulative physical toll of crystal methamphetamine over time, while strictly preserving your facial geometry.
         </p>
       </div>
 
       {/* Top Educational Disclaimer */}
       <EducationalDisclaimer compact />
 
+      {/* Provider & Hardware Status Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+        <div className="flex items-center gap-2">
+          <Cpu className="w-4 h-4 text-sky-400 shrink-0" />
+          <span className="font-semibold text-white">AI Provider:</span>
+          <span className="font-mono text-sky-300">{engineInfo.name}</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400">
+            {engineInfo.isLocalOnly ? 'Local Simulation' : 'Private GPU'}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleProviderToggle}
+            className="text-[11px] font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-2"
+            title="Toggle between Private GPU Server and Offline Test Provider"
+          >
+            Switch to {activeProviderId === 'server-gpu' ? 'Offline Provider' : 'GPU Server'}
+          </button>
+        </div>
+      </div>
+
       {/* Processing or Error View */}
-      {isProcessing && <LoadingState progress={processingProgress} message="Rendering Educational Simulation..." />}
+      {isProcessing && (
+        <div className="space-y-4">
+          <LoadingState
+            progress={processingProgress}
+            message="Running Generative AI Image-to-Image Inference..."
+            subMessage={`Conditioning: ${activeProfile.label} • Denoising Strength: ${effectiveStrength} • SDXL Pipeline`}
+          />
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={cancelTransformation}
+              className="text-xs text-red-400 hover:text-red-300 underline underline-offset-4"
+            >
+              Cancel Generation
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && !isProcessing && (
         <ErrorState
-          title="Processing Alert"
+          title="Inference Notice"
           message={error}
           onRetry={() => {
             clearError();
-            processPathway('ice', currentStage, intensity);
+            processPathway('ice', currentStage, sliderVal, generationSeed);
           }}
         />
       )}
@@ -112,9 +189,13 @@ export const FutureIce: React.FC = () => {
                 <span>{currentStageMeta.label}</span>
               </div>
 
-              {/* Timing badge */}
-              <div className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-mono text-slate-400">
-                Rendered locally in {iceResult.executionTimeMs}ms
+              {/* Technical Model Metadata */}
+              <div className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[10px] font-mono text-slate-300 flex items-center gap-1.5">
+                <span>{iceResult.isLiveGpuInference ? 'GPU' : 'API Standby'}</span>
+                <span>•</span>
+                <span>Strength {iceResult.effectiveStrength ?? effectiveStrength}</span>
+                <span>•</span>
+                <span>{iceResult.executionTimeMs}ms</span>
               </div>
             </div>
 
@@ -142,14 +223,17 @@ export const FutureIce: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Stage Controls & Dermatological Insights */}
+          {/* Right Column: Stage Controls & Model Parameters */}
           <div className="lg:col-span-6 space-y-6">
             {/* Stage Selector */}
             <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-sky-400" />
-                <span>Select Timeline Stage</span>
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-sky-400" />
+                  <span>Timeline Scenario</span>
+                </h3>
+                <span className="text-xs text-slate-500">Non-Predictive Scenario</span>
+              </div>
 
               <div className="grid grid-cols-3 gap-2">
                 {APP_CONFIG.stages.map((stg) => {
@@ -172,28 +256,49 @@ export const FutureIce: React.FC = () => {
                 })}
               </div>
 
-              {/* Fine-Tuning Slider */}
+              {/* Denoising Strength / Intensity Slider */}
               <div className="pt-2 space-y-2">
                 <div className="flex justify-between text-xs text-slate-400">
-                  <span>Simulation Intensity</span>
-                  <span className="font-mono text-amber-400">{Math.round(intensity * 100)}%</span>
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <span>Transformation Intensity</span>
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      (Denoising Strength: {effectiveStrength})
+                    </span>
+                  </span>
+                  <span className="font-mono text-amber-400">{Math.round(sliderVal * 100)}%</span>
                 </div>
                 <input
                   type="range"
                   min="0.2"
                   max="1.0"
                   step="0.05"
-                  value={intensity}
-                  onChange={handleIntensityChange}
-                  onMouseUp={handleIntensityRelease}
-                  onTouchEnd={handleIntensityRelease}
+                  value={sliderVal}
+                  onChange={handleSliderChange}
                   className="w-full accent-amber-500 bg-slate-800 rounded-lg cursor-pointer"
-                  aria-label="Simulation intensity"
+                  aria-label="Generative transformation intensity"
                 />
+                <p className="text-[11px] text-slate-500">
+                  Intensity modulates SDXL latent denoising (0.18 – 0.60), altering skin texture without destroying identity.
+                </p>
+              </div>
+
+              {/* Seed / Re-roll Control */}
+              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                <div className="text-xs text-slate-400 font-mono">
+                  Seed: <span className="text-slate-200">{iceResult.seed || 'Random'}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRerollSeed}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-amber-300 transition-colors"
+                >
+                  <Dices className="w-3.5 h-3.5" />
+                  <span>Re-roll Seed</span>
+                </button>
               </div>
             </div>
 
-            {/* Stage Explanation Card */}
+            {/* Stage Educational Explanation Card */}
             <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
@@ -205,8 +310,11 @@ export const FutureIce: React.FC = () => {
               <p className="text-xs text-slate-300 leading-relaxed">
                 {currentStageMeta.description}
               </p>
-              <div className="pt-2 text-[11px] text-slate-400 border-t border-slate-800/80">
-                Note: Biological consequences vary significantly between individuals. This illustration is non-predictive.
+              <div className="pt-2 text-[11px] text-slate-400 border-t border-slate-800/80 flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+                <span>
+                  All transformations are fictional educational illustrations generated via controlled prompt conditioning.
+                </span>
               </div>
             </div>
 

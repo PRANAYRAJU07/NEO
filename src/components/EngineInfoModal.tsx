@@ -7,7 +7,7 @@ interface EngineInfoModalProps {
 }
 
 export const EngineInfoModal: React.FC<EngineInfoModalProps> = ({ onClose }) => {
-  const { engineInfo } = useApp();
+  const { engineInfo, activeProviderId, setProviderId } = useApp();
 
   return (
     <div
@@ -29,65 +29,102 @@ export const EngineInfoModal: React.FC<EngineInfoModalProps> = ({ onClose }) => 
         <div className="flex items-center gap-3 text-sky-400 mb-4">
           <Cpu className="w-6 h-6" />
           <h2 id="engine-modal-title" className="text-xl font-bold">
-            On-Device Engine Architecture & Provenance
+            NEO Generative AI Engine Architecture
           </h2>
         </div>
 
         <div className="space-y-4 text-sm leading-relaxed text-slate-300">
           {/* Active Engine Card */}
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="flex items-center justify-between mb-2">
+          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-wider font-bold text-slate-400">
-                Active Transformation Pipeline
+                Active Generative Pipeline
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-300">
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-950/60 border border-sky-800/60 text-sky-300">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Verified Local Execution
+                {engineInfo.type === 'server-gpu' ? 'Private GPU Connected' : 'Offline Simulation'}
               </span>
             </div>
-            <h3 className="text-base font-bold text-white mb-1">{engineInfo.name}</h3>
-            <p className="text-xs text-slate-400 mb-3">{engineInfo.description}</p>
+
+            <div>
+              <h3 className="text-base font-bold text-white mb-1">{engineInfo.name}</h3>
+              <p className="text-xs text-slate-400">{engineInfo.description}</p>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/80 p-3 rounded-lg border border-slate-800">
               <div>
-                <span className="text-slate-500 block">Version:</span>
-                <span className="font-mono text-slate-200">{engineInfo.version}</span>
+                <span className="text-slate-500 block">Model Pipeline:</span>
+                <span className="font-mono text-slate-200">SDXL Base 1.0 (Img2Img)</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Network Transmission:</span>
-                <span className="font-semibold text-emerald-400">0 KB (Zero egress)</span>
+                <span className="text-slate-500 block">Denoising Range:</span>
+                <span className="font-semibold text-sky-400">0.18 – 0.60 (Identity-Preserving)</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Acceleration:</span>
-                <span className="text-slate-200">{engineInfo.hardwareAcceleration || 'Canvas 2D / Wasm'}</span>
+                <span className="text-slate-200">{engineInfo.hardwareAcceleration || 'PyTorch CUDA fp16'}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">ONNX Runtime Status:</span>
-                <span className="text-slate-200">{engineInfo.modelLoaded ? 'Model Loaded' : 'Wasm Web Engine (Active)'}</span>
+                <span className="text-slate-500 block">Image Storage:</span>
+                <span className="text-emerald-400 font-semibold">0 KB (Volatile RAM Only)</span>
+              </div>
+            </div>
+
+            {/* Provider Switcher inside modal */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
+              <span className="text-slate-400">Switch Active Provider:</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setProviderId('server-gpu')}
+                  className={`px-3 py-1 rounded-lg border font-medium ${
+                    activeProviderId === 'server-gpu'
+                      ? 'bg-sky-600 text-white border-sky-500'
+                      : 'bg-slate-800 text-slate-300 border-slate-700'
+                  }`}
+                >
+                  Private GPU Server
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProviderId('mock-ai')}
+                  className={`px-3 py-1 rounded-lg border font-medium ${
+                    activeProviderId === 'mock-ai'
+                      ? 'bg-sky-600 text-white border-sky-500'
+                      : 'bg-slate-800 text-slate-300 border-slate-700'
+                  }`}
+                >
+                  Offline Test Provider
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Privacy & Provenance Disclosure */}
+          {/* Model Selection & Verification Report */}
           <div className="space-y-3">
             <h4 className="font-semibold text-slate-100 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Privacy & Child-Safety Architecture</span>
+              <HardDrive className="w-4 h-4 text-sky-400" />
+              <span>Model Selection & Provenance: Stable Diffusion XL (SDXL)</span>
             </h4>
             <p className="text-xs text-slate-300">
-              Unlike cloud-based generative AI systems that transmit photos to remote data centers, NEO performs all image calculations directly inside your browser’s local JavaScript / WebAssembly sandbox. Student photos never leave the device.
+              Unlike legacy filter approaches (grayscale/blur), NEO integrates with Stable Diffusion XL Base 1.0 image-to-image. SDXL was selected because:
             </p>
+            <ul className="list-disc pl-5 text-xs text-slate-300 space-y-1">
+              <li><strong>Photorealistic Dermal Rendering:</strong> High-frequency pore, skin-tone, and lighting realism far superior to older diffusion models.</li>
+              <li><strong>Strict Identity Preservation:</strong> Conditioned via calibrated latent denoising strength (0.18 – 0.60) ensuring facial structure, eyes, clothing, and pose remain recognizable.</li>
+              <li><strong>Licensing & Ethics:</strong> Permitted under CreativeML OpenRAIL++-M for non-profit educational and substance prevention applications.</li>
+            </ul>
 
             <h4 className="font-semibold text-slate-100 flex items-center gap-2">
-              <HardDrive className="w-4 h-4 text-sky-400" />
-              <span>Model Feasibility & Licensing Status</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Privacy & Child Safety Guarantees</span>
             </h4>
             <p className="text-xs text-slate-300">
-              High-parameter cloud diffusion models (e.g. 2GB+ checkpoints) exceed mobile cellular bandwidth and mobile browser GPU limits, and raise critical child-safety and consent concerns. NEO implements a verified on-device shader engine coupled with an ONNX Runtime Web adapter designed to host lightweight, ethical, non-stigmatising models once approved by AAIC.
+              When communicating with the private GPU server, images are loaded strictly in volatile memory (RAM/VRAM) during inference and immediately garbage-collected. Zero photos are written to persistent server disks or transmitted to third-party APIs.
             </p>
 
-            <div className="p-3 rounded-xl bg-sky-950/20 border border-sky-800/40 text-xs text-sky-200 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-800/40 text-xs text-amber-200 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
                 All transformations are scientifically grounded illustrative simulations, explicitly categorized as educational tools rather than predictive medical forecasts.
               </span>

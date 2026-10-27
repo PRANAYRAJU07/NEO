@@ -4,7 +4,7 @@ test.describe('NEO: Student Prevention Journeys', () => {
   test('Complete journey via Continue Without Photo / Demo Avatar', async ({ page }) => {
     // 1. Welcome screen
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: /NEO – Face the Future/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /NEO.*Face the Future/i })).toBeVisible();
     await expect(page.getByText('ICE — NOT EVEN ONCE').first()).toBeVisible();
     await expect(page.getByText('CHOOSE LIFE SO THAT YOU MAY LIVE').first()).toBeVisible();
 

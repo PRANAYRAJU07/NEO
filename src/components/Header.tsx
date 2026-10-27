@@ -56,15 +56,15 @@ export const Header: React.FC = () => {
 
           {/* Desktop Navigation & Actions */}
           <div className="hidden md:flex items-center gap-3">
-            {/* On-device engine provenance pill */}
+            {/* AI Engine provenance pill */}
             <button
               type="button"
               onClick={() => setShowEngineModal(true)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-700/80 text-sky-400 hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
-              title="Click to view engine provenance & privacy architecture"
+              title="Click to view generative AI engine provenance & privacy architecture"
             >
               <Cpu className="w-3.5 h-3.5" />
-              <span>{engineInfo.isLocalOnly ? '100% On-Device' : 'Engine Info'}</span>
+              <span>{engineInfo.type === 'server-gpu' ? 'GPU AI Engine' : 'AI Engine Info'}</span>
             </button>
 
             {/* Privacy indicator */}
@@ -103,8 +103,19 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile hamburger toggle */}
+          {/* Mobile quick actions & hamburger toggle */}
           <div className="flex md:hidden items-center gap-2">
+            {photo && (
+              <button
+                type="button"
+                onClick={() => setShowResetConfirm(true)}
+                className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:text-red-300"
+                aria-label="Reset"
+                title="Reset"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            )}
             <Link
               to="/help"
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-amber-400"

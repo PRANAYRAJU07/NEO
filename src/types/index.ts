@@ -15,7 +15,7 @@ export interface PhotoData {
 export type TransformationPathway = 'ice' | 'healthy';
 export type TransformationStage = 1 | 2 | 3;
 
-export type EngineType = 'canvas-procedural' | 'onnx-runtime' | 'fallback-prototype';
+export type EngineType = 'server-gpu' | 'canvas-procedural' | 'onnx-runtime' | 'mock-ai';
 
 export interface EngineInfo {
   type: EngineType;
@@ -26,6 +26,10 @@ export interface EngineInfo {
   description: string;
   provenance: string;
   hardwareAcceleration?: string;
+  endpointUrl?: string;
+  serverStatus?: 'ready' | 'loading' | 'cpu_fallback' | 'offline';
+  device?: string;
+  vramInfo?: string;
 }
 
 export interface TransformationResult {
@@ -36,12 +40,20 @@ export interface TransformationResult {
   executionTimeMs: number;
   engineUsed: EngineType;
   timestamp: number;
+  seed?: number;
+  effectiveStrength?: number;
+  promptUsed?: string;
+  negativePromptUsed?: string;
+  modelName?: string;
+  isLiveGpuInference?: boolean;
+  notes?: string;
 }
 
 export interface ConsentState {
   agreedToPrivacy: boolean;
   acknowledgedEducationalOnly: boolean;
   confirmedAgeAppropriate: boolean;
+  agreedToServerProcessing?: boolean;
   timestamp?: number;
 }
 
@@ -77,4 +89,12 @@ export interface ImageValidationResult {
   valid: boolean;
   error?: ImageValidationError;
   dimensions?: { width: number; height: number };
+}
+
+export interface FaceAnalysisResult {
+  faceDetected: boolean;
+  confidence: number;
+  aspectRatio: number;
+  isCentered: boolean;
+  recommendations: string[];
 }

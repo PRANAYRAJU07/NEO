@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -8,6 +8,8 @@ import {
   SplitSquareVertical,
   Activity,
   Award,
+  UserCheck,
+  Info,
 } from 'lucide-react';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { EducationalDisclaimer } from '../components/EducationalDisclaimer';
@@ -28,19 +30,24 @@ export const HealthyFuture: React.FC = () => {
     clearError,
   } = useApp();
 
-  // If no photo is selected, prompt user to pick one
-  useEffect(() => {
-    if (!photo) {
-      navigate('/selfie');
-      return;
-    }
+  // User can view their authentic baseline, or optionally generate a simulated vitality enhancement
+  const [viewMode, setViewMode] = useState<'authentic' | 'vitality_illustration'>('authentic');
 
-    if (!healthyResult && !isProcessing) {
+  if (!photo) {
+    navigate('/selfie');
+    return null;
+  }
+
+  const handleGenerateVitalityIllustration = () => {
+    setViewMode('vitality_illustration');
+    if (!healthyResult) {
       processPathway('healthy', 1, 0.85);
     }
-  }, [photo, healthyResult, isProcessing, navigate, processPathway]);
+  };
 
-  if (!photo) return null;
+  const displayedImage = viewMode === 'vitality_illustration' && healthyResult
+    ? healthyResult.imageUrl
+    : photo.blobUrl;
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-10 space-y-8 animate-fade-in">
@@ -54,7 +61,7 @@ export const HealthyFuture: React.FC = () => {
           My Healthy Future
         </h1>
         <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-          Choosing life preserves your natural vitality, clear skin, cognitive potential, and lifelong opportunities.
+          Your authentic natural appearance represents the vitality, health, and potential that choosing life protects.
         </p>
       </div>
 
@@ -64,7 +71,7 @@ export const HealthyFuture: React.FC = () => {
           &ldquo;{APP_CONFIG.slogans.secondary}&rdquo;
         </p>
         <p className="text-xs text-slate-400 mt-1">
-          Every positive choice today protects your body, mind, and relationships tomorrow.
+          Every positive choice today preserves your natural biological health, mental clarity, and future relationships.
         </p>
       </div>
 
@@ -72,7 +79,13 @@ export const HealthyFuture: React.FC = () => {
       <EducationalDisclaimer compact />
 
       {/* Processing or Error View */}
-      {isProcessing && <LoadingState progress={processingProgress} message="Rendering Healthy Future Visualization..." />}
+      {isProcessing && (
+        <LoadingState
+          progress={processingProgress}
+          message="Generating Illustrative Vitality Enhancement..."
+          subMessage="Applying subtle generative health and hydration conditioning."
+        />
+      )}
 
       {error && !isProcessing && (
         <ErrorState
@@ -85,28 +98,64 @@ export const HealthyFuture: React.FC = () => {
         />
       )}
 
-      {/* Main Content when Result is Ready */}
-      {!isProcessing && healthyResult && (
+      {/* Main Content */}
+      {!isProcessing && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Visual Output */}
           <div className="lg:col-span-6 space-y-4">
             <div className="relative rounded-3xl overflow-hidden border-2 border-emerald-500/50 bg-slate-950 shadow-2xl shadow-emerald-950/30 aspect-square">
               <img
-                src={healthyResult.imageUrl}
-                alt="Simulated outcome: My Healthy Future"
+                src={displayedImage}
+                alt="My Healthy Future"
                 className="w-full h-full object-cover"
               />
 
               {/* Status Badge */}
               <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-emerald-700/80 text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
-                <Sun className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Natural Vitality & Radiance</span>
+                {viewMode === 'authentic' ? (
+                  <>
+                    <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Your Authentic Baseline (Protected)</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>AI Vitality Illustration</span>
+                  </>
+                )}
               </div>
 
-              {/* Timing badge */}
-              <div className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-mono text-slate-400">
-                Rendered locally in {healthyResult.executionTimeMs}ms
-              </div>
+              {viewMode === 'vitality_illustration' && healthyResult && (
+                <div className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-mono text-slate-300">
+                  {healthyResult.isLiveGpuInference ? 'GPU SDXL' : 'Simulation'} • {healthyResult.executionTimeMs}ms
+                </div>
+              )}
+            </div>
+
+            {/* View Mode Toggle Controls */}
+            <div className="flex items-center justify-center p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('authentic')}
+                className={`flex-1 py-2 px-3 rounded-xl font-semibold transition-all ${
+                  viewMode === 'authentic'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Authentic Face (Recommended)
+              </button>
+              <button
+                type="button"
+                onClick={handleGenerateVitalityIllustration}
+                className={`flex-1 py-2 px-3 rounded-xl font-semibold transition-all ${
+                  viewMode === 'vitality_illustration'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Optional AI Vitality Preview
+              </button>
             </div>
 
             {/* Quick action bar */}
@@ -155,6 +204,16 @@ export const HealthyFuture: React.FC = () => {
                   </p>
                 </div>
               ))}
+            </div>
+
+            <div className="rounded-2xl bg-emerald-950/20 border border-emerald-800/30 p-4 space-y-1.5 text-xs text-slate-300">
+              <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                <Info className="w-4 h-4" />
+                <span>Respectful Representation Policy</span>
+              </div>
+              <p className="leading-relaxed">
+                NEO does not claim that AI can predict clinical recovery or guarantee specific medical outcomes. Your natural face today represents the health, dignity, and opportunities you protect by choosing life.
+              </p>
             </div>
 
             {/* AAIC Support Card */}
