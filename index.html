@@ -7,8 +7,8 @@
     <meta name="description" content="NEO – Face the Future. An educational youth prevention experience by the Australian Anti Ice Campaign (AAIC). Fictional illustrations highlighting the value of healthy choices." />
     <meta name="theme-color" content="#0b192c" />
     
-    <!-- Security Headers / CSP (Local browser processing, no external tracking or selfie leaks) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob: data:; object-src 'none'; base-uri 'self';" />
+    <!-- Security Headers / CSP (Local browser processing & private GPU server connection) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 ws://localhost:5173 ws://127.0.0.1:5173 blob: data:; object-src 'none'; base-uri 'self';" />
     
     <!-- Google Fonts Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

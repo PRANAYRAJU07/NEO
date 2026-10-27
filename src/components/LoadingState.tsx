@@ -5,12 +5,14 @@ interface LoadingStateProps {
   progress?: number;
   message?: string;
   subMessage?: string;
+  privacyBadge?: string;
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
   progress = 45,
   message = 'Generating Educational Visualization...',
   subMessage = 'Processing 100% on-device inside your browser sandbox. No images leave your phone.',
+  privacyBadge,
 }) => {
   return (
     <div
@@ -47,10 +49,10 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         </div>
       </div>
 
-      {/* Zero Upload Privacy Assurance */}
+      {/* Privacy Assurance Badge */}
       <div className="pt-2 flex items-center justify-center gap-2 text-xs text-emerald-400/90 font-medium bg-emerald-950/20 py-2 px-3 rounded-xl border border-emerald-800/30">
         <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-        <span>Zero Network Egress • Local Canvas/Wasm Engine</span>
+        <span>{privacyBadge || 'Zero Network Egress • Local Canvas/Wasm Engine'}</span>
       </div>
     </div>
   );

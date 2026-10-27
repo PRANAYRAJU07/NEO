@@ -10,10 +10,13 @@ test.describe('Privacy & Security Verification', () => {
       const method = req.method();
       const postData = req.postData();
 
-      // Check if any POST/PUT request carries image or base64 data
+      // Check if any POST/PUT request carries image or base64 data to unauthorized external endpoints
       if ((method === 'POST' || method === 'PUT') && postData) {
         if (postData.includes('data:image') || postData.includes('image/') || postData.includes('selfie')) {
-          outgoingImageRequests.push(url);
+          // Allow internal private backend on localhost/127.0.0.1; disallow third-party / cloud AI leakage
+          if (!url.includes('localhost:8000') && !url.includes('127.0.0.1:8000') && !url.includes('localhost:5173')) {
+            outgoingImageRequests.push(url);
+          }
         }
       }
 

@@ -42,11 +42,17 @@ export const FutureIce: React.FC = () => {
 
   const [sliderVal, setSliderVal] = useState<number>(intensity);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTriggeredInitialRef = useRef(false);
 
   // Sync sliderVal with global intensity
   useEffect(() => {
     setSliderVal(intensity);
   }, [intensity]);
+
+  // Reset initial trigger flag if photo changes
+  useEffect(() => {
+    hasTriggeredInitialRef.current = false;
+  }, [photo?.blobUrl]);
 
   // If no photo is selected, prompt user to pick one
   useEffect(() => {
@@ -55,14 +61,16 @@ export const FutureIce: React.FC = () => {
       return;
     }
 
-    // Automatically trigger initial generation if not present
-    if (!iceResult && !isProcessing) {
+    // Automatically trigger initial generation if not present, not processing, and no unhandled error
+    if (!iceResult && !isProcessing && !error && !hasTriggeredInitialRef.current) {
+      hasTriggeredInitialRef.current = true;
       processPathway('ice', currentStage, intensity, generationSeed);
     }
-  }, [photo, iceResult, isProcessing, currentStage, intensity, generationSeed, navigate, processPathway]);
+  }, [photo, iceResult, isProcessing, error, currentStage, intensity, generationSeed, navigate, processPathway]);
 
   const handleStageChange = (stage: TransformationStage) => {
     setStage(stage);
+    clearError();
     processPathway('ice', stage, sliderVal, generationSeed);
   };
 
@@ -76,6 +84,7 @@ export const FutureIce: React.FC = () => {
     }
     debounceTimerRef.current = setTimeout(() => {
       setIntensity(val);
+      clearError();
       processPathway('ice', currentStage, val, generationSeed);
     }, 400);
   };
@@ -83,12 +92,15 @@ export const FutureIce: React.FC = () => {
   const handleRerollSeed = () => {
     const newSeed = Math.floor(Math.random() * 900000) + 100000;
     setGenerationSeed(newSeed);
+    clearError();
     processPathway('ice', currentStage, sliderVal, newSeed);
   };
 
   const handleProviderToggle = () => {
     const nextProvider = activeProviderId === 'server-gpu' ? 'mock-ai' : 'server-gpu';
     setProviderId(nextProvider);
+    clearError();
+    hasTriggeredInitialRef.current = false;
     processPathway('ice', currentStage, sliderVal, generationSeed);
   };
 
@@ -147,6 +159,11 @@ export const FutureIce: React.FC = () => {
             progress={processingProgress}
             message="Running Generative AI Image-to-Image Inference..."
             subMessage={`Conditioning: ${activeProfile.label} • Denoising Strength: ${effectiveStrength} • SDXL Pipeline`}
+            privacyBadge={
+              activeProviderId === 'server-gpu'
+                ? 'Zero Persistent Storage • Private Ephemeral In-Memory Inference'
+                : 'Zero Network Egress • Offline On-Device Simulation'
+            }
           />
           <div className="flex justify-center">
             <button
@@ -161,14 +178,33 @@ export const FutureIce: React.FC = () => {
       )}
 
       {error && !isProcessing && (
-        <ErrorState
-          title="Inference Notice"
-          message={error}
-          onRetry={() => {
-            clearError();
-            processPathway('ice', currentStage, sliderVal, generationSeed);
-          }}
-        />
+        <div className="space-y-4">
+          <ErrorState
+            title="Inference Notice"
+            message={error}
+            onRetry={() => {
+              clearError();
+              hasTriggeredInitialRef.current = false;
+              processPathway('ice', currentStage, sliderVal, generationSeed);
+            }}
+          />
+          {activeProviderId === 'server-gpu' && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setProviderId('mock-ai');
+                  clearError();
+                  hasTriggeredInitialRef.current = false;
+                  processPathway('ice', currentStage, sliderVal, generationSeed);
+                }}
+                className="px-4 py-2 rounded-xl bg-sky-950/80 border border-sky-700/60 text-xs font-semibold text-sky-300 hover:bg-sky-900 transition-colors shadow-lg"
+              >
+                Switch to Offline Simulation Provider & Continue
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Main Content when Result is Ready */}

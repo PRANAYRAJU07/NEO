@@ -162,6 +162,11 @@ export class ServerGpuProvider implements ITransformationProvider {
       if (err instanceof DOMException && err.name === 'AbortError') {
         throw new Error('Transformation cancelled by user');
       }
+      if (err instanceof TypeError && err.message.toLowerCase().includes('fetch')) {
+        throw new Error(
+          `Unable to connect to Private GPU service at ${this.baseUrl}. Please verify the Python backend is running on port 8000, or switch to the Offline Provider.`
+        );
+      }
       throw err;
     } finally {
       this.currentAbortController = null;
