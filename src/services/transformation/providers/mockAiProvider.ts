@@ -103,40 +103,55 @@ export class MockAiProvider implements ITransformationProvider {
 
       const dx = (x - centerX) / maxDist;
       const dy = (y - centerY) / maxDist;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // 1. Smooth elliptical face mask
+      const faceMask = Math.max(0, Math.min(1, Math.exp(-Math.pow(dx / 0.50, 4) - Math.pow(dy / 0.62, 4))));
 
       if (pathway === 'ice') {
-        // Desaturation mapped to effective strength
+        // 2. Smooth Continuous Gaussian Periorbital Dark Circles
+        const dLeftEye = (dx + 0.18) * (dx + 0.18) / (2 * 0.08 * 0.08) + (dy + 0.02) * (dy + 0.02) / (2 * 0.05 * 0.05);
+        const dRightEye = (dx - 0.18) * (dx - 0.18) / (2 * 0.08 * 0.08) + (dy + 0.02) * (dy + 0.02) / (2 * 0.05 * 0.05);
+        const eyeHollow = Math.min(1, Math.exp(-dLeftEye) + Math.exp(-dRightEye)) * faceMask;
+
+        // 3. Smooth Continuous Sub-malar Cheek Hollows (Gauntness)
+        const lxRot = (dx + 0.22) * 0.969 - (dy - 0.15) * 0.247;
+        const lyRot = (dx + 0.22) * 0.247 + (dy - 0.15) * 0.969;
+        const dLeftCheek = (lxRot * lxRot) / (2 * 0.08 * 0.08) + (lyRot * lyRot) / (2 * 0.13 * 0.13);
+
+        const rxRot = (dx - 0.22) * 0.969 - (dy - 0.15) * (-0.247);
+        const ryRot = (dx - 0.22) * (-0.247) + (dy - 0.15) * 0.969;
+        const dRightCheek = (rxRot * rxRot) / (2 * 0.08 * 0.08) + (ryRot * ryRot) / (2 * 0.13 * 0.13);
+
+        const cheekHollow = Math.min(1, Math.exp(-dLeftCheek) + Math.exp(-dRightCheek)) * faceMask;
+
+        // Desaturation mapped to effective strength & face mask
         const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-        const desat = Math.min(1.0, effectiveStrength * (0.6 + stage * 0.15));
+        const desat = Math.min(1.0, (0.08 + 0.08 * stage) * effectiveStrength * faceMask);
         let newR = r * (1 - desat) + lum * desat;
         let newG = g * (1 - desat) + lum * desat;
         let newB = b * (1 - desat) + lum * desat;
 
         // Sallow undertone
-        newR = Math.max(0, newR - 16 * effectiveStrength);
-        newB = Math.min(255, newB + 9 * effectiveStrength);
+        newR = Math.max(0, newR - 10 * stage * effectiveStrength * faceMask);
+        newB = Math.max(0, newB - 6 * stage * effectiveStrength * faceMask);
 
-        // Orbital and cheek hollows
-        const isUnderEye = Math.abs(dy + 0.05) < 0.12 && Math.abs(dx) > 0.08 && Math.abs(dx) < 0.35;
-        if (isUnderEye) {
-          const darkFactor = 1.0 - 0.25 * effectiveStrength;
-          newR *= darkFactor;
-          newG *= darkFactor;
-          newB *= darkFactor * 1.03;
-        }
+        // Orbital eye socket deepening (smooth continuous shading, no hard boxes)
+        const eyeDarken = (0.24 + 0.12 * stage) * effectiveStrength * eyeHollow;
+        newR *= (1.0 - eyeDarken);
+        newG *= (1.0 - eyeDarken * 1.05);
+        newB *= (1.0 - eyeDarken * 0.92);
 
-        const isCheek = dy > 0.05 && dy < 0.30 && Math.abs(dx) > 0.15 && Math.abs(dx) < 0.45;
-        if (isCheek && stage >= 2) {
-          const hollowFactor = 1.0 - 0.18 * effectiveStrength;
-          newR *= hollowFactor;
-          newG *= hollowFactor;
-          newB *= hollowFactor;
+        // Cheek gauntness shading for stage >= 2
+        if (stage >= 2) {
+          const cheekDarken = (0.12 + 0.10 * (stage - 1)) * effectiveStrength * cheekHollow;
+          newR *= (1.0 - cheekDarken);
+          newG *= (1.0 - cheekDarken);
+          newB *= (1.0 - cheekDarken);
         }
 
         // Micro-texture dehydration
-        if (stage >= 2 && dist < 0.45) {
-          const noise = (((x * 5) ^ (y * 11)) % 7 - 3) * effectiveStrength * 2.2;
+        if (stage >= 2 && faceMask > 0.3) {
+          const noise = (((x * 7) ^ (y * 13)) % 7 - 3) * effectiveStrength * 1.5;
           newR = Math.max(0, Math.min(255, newR + noise));
           newG = Math.max(0, Math.min(255, newG + noise));
           newB = Math.max(0, Math.min(255, newB + noise));
@@ -147,18 +162,10 @@ export class MockAiProvider implements ITransformationProvider {
         data[i + 2] = Math.round(newB);
       } else {
         // Healthy pathway: warm vitality & eye catchlight
-        const warmFactor = 1.0 + 0.08 * effectiveStrength;
-        let newR = r * warmFactor + 4 * effectiveStrength;
-        let newG = g * (1.0 + 0.03 * effectiveStrength) + 2 * effectiveStrength;
-        let newB = b * (1.0 - 0.02 * effectiveStrength);
-
-        const isEye = Math.abs(dy + 0.06) < 0.08 && Math.abs(dx) > 0.09 && Math.abs(dx) < 0.32;
-        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-        if (isEye && lum > 140) {
-          newR = Math.min(255, newR + 20 * effectiveStrength);
-          newG = Math.min(255, newG + 20 * effectiveStrength);
-          newB = Math.min(255, newB + 22 * effectiveStrength);
-        }
+        const warmFactor = 1.0 + 0.08 * effectiveStrength * faceMask;
+        let newR = r * warmFactor + 4 * effectiveStrength * faceMask;
+        let newG = g * (1.0 + 0.03 * effectiveStrength * faceMask) + 2 * effectiveStrength * faceMask;
+        let newB = b * (1.0 - 0.02 * effectiveStrength * faceMask);
 
         data[i] = Math.round(newR);
         data[i + 1] = Math.round(newG);
@@ -167,6 +174,43 @@ export class MockAiProvider implements ITransformationProvider {
     }
 
     ctx.putImageData(imgData, 0, 0);
+
+    // If ice pathway stage >= 2, render realistic excoriation sores on canvas
+    if (pathway === 'ice' && stage >= 2) {
+      const numSores = stage === 2 ? 4 : 12;
+      const rng = (s: number) => {
+        const x = Math.sin(s) * 10000;
+        return x - Math.floor(x);
+      };
+
+      for (let sIdx = 0; sIdx < numSores; sIdx++) {
+        const angle = rng(seed + sIdx * 7) * Math.PI * 2;
+        const rDist = 0.12 + rng(seed + sIdx * 13) * 0.26;
+        const sx = centerX + rDist * maxDist * Math.cos(angle);
+        const sy = centerY + rDist * maxDist * Math.sin(angle) * 1.1;
+        const rad = 2.5 + rng(seed + sIdx * 19) * 3.5;
+
+        // Inflamed red halo
+        const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad * 2.2);
+        haloGrad.addColorStop(0, `rgba(185, 28, 28, ${0.45 * effectiveStrength})`);
+        haloGrad.addColorStop(0.6, `rgba(153, 27, 27, ${0.25 * effectiveStrength})`);
+        haloGrad.addColorStop(1, 'rgba(153, 27, 27, 0)');
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(sx, sy, rad * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Dark dried scab core
+        const scabGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad);
+        scabGrad.addColorStop(0, `rgba(69, 10, 10, ${0.85 * effectiveStrength})`);
+        scabGrad.addColorStop(0.7, `rgba(88, 28, 28, ${0.70 * effectiveStrength})`);
+        scabGrad.addColorStop(1, 'rgba(88, 28, 28, 0)');
+        ctx.fillStyle = scabGrad;
+        ctx.beginPath();
+        ctx.arc(sx, sy, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
     const blobUrl = await new Promise<string>((resolve, reject) => {
       canvas.toBlob((blob) => {

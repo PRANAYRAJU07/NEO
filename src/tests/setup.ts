@@ -40,6 +40,9 @@ HTMLCanvasElement.prototype.getContext = vi.fn((contextType: string) => {
       createRadialGradient: vi.fn(() => ({
         addColorStop: vi.fn(),
       })),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
       fillRect: vi.fn(),
       save: vi.fn(),
       restore: vi.fn(),

@@ -263,78 +263,126 @@ class GenerativePipelineManager:
         seed: int
     ) -> Image.Image:
         """
-        High-fidelity mathematical pixel transformation for CPU verification mode.
-        Modulates dermal color-space, orbital fatigue contrast, and micro-texture.
+        Photorealistic anatomical facial transformation pipeline.
+        Produces smooth, continuous Gaussian periorbital hollows, sub-malar cheek gauntness,
+        sallow dermal undertones, lip dehydration, and authentic excoriation sores.
         """
-        random.seed(seed)
-        w, h = img.size
-        out = img.copy()
-        pixels = out.load()
+        import numpy as np
+        import cv2
 
-        center_x, center_y = w * 0.5, h * 0.45
-        max_dist = max(w, h) * 0.5
+        np.random.seed(seed)
+        src_np = np.array(img).astype(np.float32) / 255.0
+        h, w = src_np.shape[:2]
 
-        for y in range(h):
-            for x in range(w):
-                r, g, b = pixels[x, y]
-                dx = (x - center_x) / max_dist
-                dy = (y - center_y) / max_dist
-                dist = (dx * dx + dy * dy) ** 0.5
+        # Normalized coordinate grid [-1, 1] relative to face center
+        Y, X = np.ogrid[:h, :w]
+        cx, cy = w * 0.5, h * 0.44
+        scale = max(w, h) * 0.5
+        nx = (X - cx) / scale
+        ny = (Y - cy) / scale
 
-                if pathway == 'ice':
-                    # Desaturation based on strength
-                    lum = int(0.299 * r + 0.587 * g + 0.114 * b)
-                    desat = min(1.0, strength * (0.5 + stage * 0.15))
-                    new_r = int(r * (1 - desat) + lum * desat)
-                    new_g = int(g * (1 - desat) + lum * desat)
-                    new_b = int(b * (1 - desat) + lum * desat)
+        # 1. Smooth elliptical face mask (preserves background and perimeter)
+        face_mask = np.exp(-((nx / 0.50)**4 + (ny / 0.62)**4))
+        face_mask = np.clip(face_mask, 0.0, 1.0)
 
-                    # Subtle cool undertone
-                    new_r = max(0, new_r - int(15 * strength))
-                    new_b = min(255, new_b + int(8 * strength))
+        if pathway == 'ice':
+            # 2. Continuous Gaussian Periorbital Dark Circles (Eye Sockets)
+            d_left_eye = ((nx + 0.18)**2 / (2 * 0.08**2) + (ny + 0.02)**2 / (2 * 0.05**2))
+            d_right_eye = ((nx - 0.18)**2 / (2 * 0.08**2) + (ny + 0.02)**2 / (2 * 0.05**2))
+            eye_hollow = np.exp(-d_left_eye) + np.exp(-d_right_eye)
+            eye_hollow = np.clip(eye_hollow, 0.0, 1.0) * face_mask
 
-                    # Orbital hollow shadowing
-                    is_under_eye = abs(dy + 0.05) < 0.12 and 0.08 < abs(dx) < 0.35
-                    if is_under_eye:
-                        factor = 1.0 - (0.24 * strength)
-                        new_r = int(new_r * factor)
-                        new_g = int(new_g * factor)
-                        new_b = int(new_b * factor * 1.03)
+            # 3. Continuous Sub-malar Cheek Hollows (Gauntness / Volume Loss)
+            lx_rot = (nx + 0.22) * np.cos(0.25) - (ny - 0.15) * np.sin(0.25)
+            ly_rot = (nx + 0.22) * np.sin(0.25) + (ny - 0.15) * np.cos(0.25)
+            d_left_cheek = (lx_rot**2 / (2 * 0.08**2) + ly_rot**2 / (2 * 0.13**2))
 
-                    # Cheek hollow gauntness for stage >= 2
-                    is_cheek = dy > 0.05 and dy < 0.30 and 0.15 < abs(dx) < 0.45
-                    if is_cheek and stage >= 2:
-                        factor = 1.0 - (0.16 * strength)
-                        new_r = int(new_r * factor)
-                        new_g = int(new_g * factor)
-                        new_b = int(new_b * factor)
+            rx_rot = (nx - 0.22) * np.cos(-0.25) - (ny - 0.15) * np.sin(-0.25)
+            ry_rot = (nx - 0.22) * np.sin(-0.25) + (ny - 0.15) * np.cos(-0.25)
+            d_right_cheek = (rx_rot**2 / (2 * 0.08**2) + ry_rot**2 / (2 * 0.13**2))
 
-                    # High-frequency dermal dehydration texture
-                    if stage >= 2 and dist < 0.45:
-                        noise = int((((x * 7) ^ (y * 13)) % 7 - 3) * strength * 2.0)
-                        new_r = max(0, min(255, new_r + noise))
-                        new_g = max(0, min(255, new_g + noise))
-                        new_b = max(0, min(255, new_b + noise))
+            cheek_hollow = np.exp(-d_left_cheek) + np.exp(-d_right_cheek)
+            cheek_hollow = np.clip(cheek_hollow, 0.0, 1.0) * face_mask
 
-                    pixels[x, y] = (new_r, new_g, new_b)
-                else:
-                    # Healthy pathway: warm vitality & eye catchlight
-                    warm = 1.0 + (0.08 * strength)
-                    new_r = min(255, int(r * warm + 4 * strength))
-                    new_g = min(255, int(g * (1.0 + 0.03 * strength) + 2 * strength))
-                    new_b = max(0, int(b * (1.0 - 0.02 * strength)))
+            # 4. Temple Depressions
+            d_left_temple = ((nx + 0.26)**2 / (2 * 0.05**2) + (ny + 0.16)**2 / (2 * 0.07**2))
+            d_right_temple = ((nx - 0.26)**2 / (2 * 0.05**2) + (ny + 0.16)**2 / (2 * 0.07**2))
+            temple_hollow = np.exp(-d_left_temple) + np.exp(-d_right_temple)
+            temple_hollow = np.clip(temple_hollow, 0.0, 1.0) * face_mask
 
-                    # Eye clarity
-                    is_eye = abs(dy + 0.06) < 0.08 and 0.09 < abs(dx) < 0.32
-                    lum = 0.299 * r + 0.587 * g + 0.114 * b
-                    if is_eye and lum > 140:
-                        new_r = min(255, new_r + int(18 * strength))
-                        new_g = min(255, new_g + int(18 * strength))
-                        new_b = min(255, new_b + int(20 * strength))
+            # Convert to YCrCb for realistic dermal chrominance manipulation
+            bgr = cv2.cvtColor(src_np, cv2.COLOR_RGB2BGR)
+            ycrcb = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+            Y_ch, Cr, Cb = ycrcb[:, :, 0], ycrcb[:, :, 1], ycrcb[:, :, 2]
 
-                    pixels[x, y] = (new_r, new_g, new_b)
+            # Sallow desaturation: reduce healthy red flush
+            desat = (0.08 + 0.08 * stage) * strength * face_mask
+            Cr = Cr * (1.0 - desat) + 0.5 * desat
+            Cb = Cb * (1.0 - desat * 0.6) + 0.48 * (desat * 0.6)
 
-        return out
+            # Deepen under-eye hollows with vascular pooling (dark brownish-purple tone)
+            eye_darken = (0.24 + 0.12 * stage) * strength * eye_hollow
+            Y_ch = Y_ch * (1.0 - eye_darken)
+            Cr = np.clip(Cr + eye_hollow * 0.035 * strength, 0.0, 1.0)
+
+            # Deepen cheek and temple gauntness for stage >= 2
+            if stage >= 2:
+                cheek_darken = (0.12 + 0.10 * (stage - 1)) * strength * (cheek_hollow + temple_hollow * 0.7)
+                Y_ch = Y_ch * (1.0 - cheek_darken)
+
+            ycrcb[:, :, 0] = np.clip(Y_ch, 0.0, 1.0)
+            ycrcb[:, :, 1] = np.clip(Cr, 0.0, 1.0)
+            ycrcb[:, :, 2] = np.clip(Cb, 0.0, 1.0)
+            bgr_out = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
+
+            # 5. Realistic excoriation sores (characteristic of clinical meth use)
+            if stage >= 2:
+                num_sores = 4 if stage == 2 else 12
+                for _ in range(num_sores):
+                    angle = np.random.uniform(0, 2 * np.pi)
+                    r_dist = np.random.uniform(0.12, 0.38)
+                    sx = cx + r_dist * scale * np.cos(angle)
+                    sy = cy + r_dist * scale * np.sin(angle) * 1.1
+
+                    if np.sqrt(((sx - cx) / scale)**2 + ((sy - cy) / scale)**2) > 0.42:
+                        continue
+
+                    rad = np.random.uniform(2.5, 6.0)
+                    d_s = ((X - sx)**2 + (Y - sy)**2)
+
+                    # Inflamed reddish halo
+                    halo = np.exp(-d_s / (2 * (rad * 2.2)**2)) * strength
+                    bgr_out[:, :, 2] = np.clip(bgr_out[:, :, 2] + halo * 0.22, 0.0, 1.0) # Red
+                    bgr_out[:, :, 0] = np.clip(bgr_out[:, :, 0] - halo * 0.12, 0.0, 1.0) # Blue
+                    bgr_out[:, :, 1] = np.clip(bgr_out[:, :, 1] - halo * 0.08, 0.0, 1.0) # Green
+
+                    # Dark dried scab core
+                    crust = np.exp(-d_s / (2 * rad**2)) * strength
+                    bgr_out[:, :, 0] = bgr_out[:, :, 0] * (1.0 - crust * 0.65)
+                    bgr_out[:, :, 1] = bgr_out[:, :, 1] * (1.0 - crust * 0.60)
+                    bgr_out[:, :, 2] = bgr_out[:, :, 2] * (1.0 - crust * 0.35)
+
+            # 6. Micro-texture dehydration noise
+            if stage >= 2:
+                noise = np.random.normal(0, 0.02 * stage * strength, (h, w, 1)).astype(np.float32)
+                bgr_out = np.clip(bgr_out + noise * face_mask[:, :, None], 0.0, 1.0)
+
+            bgr_out = bgr_out.astype(np.float32)
+            final_rgb = cv2.cvtColor(bgr_out, cv2.COLOR_BGR2RGB)
+            return Image.fromarray((final_rgb * 255.0).astype(np.uint8))
+        else:
+            # Healthy Pathway: vital warm radiance and clear eye catchlights
+            bgr = cv2.cvtColor(src_np.astype(np.float32), cv2.COLOR_RGB2BGR)
+            ycrcb = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+            Y_ch, Cr, Cb = ycrcb[:, :, 0], ycrcb[:, :, 1], ycrcb[:, :, 2]
+
+            Cr = np.clip(Cr + 0.025 * strength * face_mask, 0.0, 1.0)
+            Y_ch = np.clip(Y_ch * (1.0 + 0.04 * strength * face_mask), 0.0, 1.0)
+
+            ycrcb[:, :, 0], ycrcb[:, :, 1], ycrcb[:, :, 2] = Y_ch, Cr, Cb
+            bgr_out = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR).astype(np.float32)
+            final_rgb = cv2.cvtColor(bgr_out, cv2.COLOR_BGR2RGB)
+            return Image.fromarray((final_rgb * 255.0).astype(np.uint8))
 
     def get_status(self) -> Dict[str, Any]:
         """

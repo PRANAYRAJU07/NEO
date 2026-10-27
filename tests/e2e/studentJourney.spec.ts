@@ -27,7 +27,7 @@ test.describe('NEO: Student Prevention Journeys', () => {
     await expect(page.getByText('My Future with Ice (Simulated)')).toBeVisible();
 
     // Switch to Stage 2
-    await page.getByRole('button', { name: /Stage 2/i }).click();
+    await page.getByRole('button', { name: /Stage 2/i }).first().click();
     await expect(page.getByText('Vascular Strain & Facial Hollows')).toBeVisible();
 
     // 6. Compare Before & After

@@ -37,6 +37,13 @@ export const APP_CONFIG = {
       period: '6 – 12 Months',
       title: 'Loss of Vitality & Dehydration',
       description: 'Loss of natural skin glow, subtle dark circles from persistent sleep deprivation, and reduced skin hydration as the stimulant taxes the nervous and vascular systems.',
+      bullets: [
+        'Subtle dark circles from irregular sleep cycles',
+        'Initial reduction in dermal moisture and natural glow',
+        'Mild vascular constriction and pale undertones',
+        'Early signs of systemic physical and neurological strain',
+        'Loss of youthful facial freshness and clarity',
+      ],
     },
     {
       stage: 2 as const,
@@ -44,13 +51,27 @@ export const APP_CONFIG = {
       period: '2 – 3 Years',
       title: 'Vascular Strain & Facial Hollows',
       description: 'More pronounced gauntness around cheeks and temples, persistent dull complexion, increased skin blemishes due to chronic poor circulation and immune suppression.',
+      bullets: [
+        'Noticeable gauntness around cheeks and temple hollows',
+        'Prominent dark periorbital circles and tired appearance',
+        'Dull, sallow skin tone and reduced dermal elasticity',
+        'Occasional skin blemishes from suppressed immune function',
+        'Cumulative physical exhaustion and weight reduction',
+      ],
     },
     {
       stage: 3 as const,
       label: 'Chronic Impact (Stage 3)',
       period: '4+ Years',
       title: 'Advanced Systemic Toll',
-      description: 'Significant loss of facial volume, hollowed eyes, premature deep expression strain, and pale/sallow tone resulting from prolonged malnutrition and toxicity.',
+      description: 'Prolonged ice use is associated with significant physical and mental health deterioration. This stage illustrates potential visible effects based on clinical and real-world research.',
+      bullets: [
+        'Noticeable facial weight loss and hollowing',
+        'Increased skin blemishes, sores and uneven skin texture',
+        'Premature aging and deeper under-eye circles',
+        'Duller complexion and reduced skin elasticity',
+        'Greater overall fatigue and physical decline',
+      ],
     },
   ],
   healthyAspects: [
