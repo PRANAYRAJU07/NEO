@@ -22,8 +22,10 @@ describe('On-Device Facial Transformation Engine', () => {
 
   it('runs Ice pathway transformation locally and produces a valid Blob URL', async () => {
     const mockImg = new Image();
-    mockImg.naturalWidth = 400;
-    mockImg.naturalHeight = 400;
+    mockImg.width = 400;
+    mockImg.height = 400;
+    Object.defineProperty(mockImg, 'naturalWidth', { value: 400 });
+    Object.defineProperty(mockImg, 'naturalHeight', { value: 400 });
 
     const result = await proceduralEngine.transform(mockImg, {
       pathway: 'ice',
@@ -40,8 +42,10 @@ describe('On-Device Facial Transformation Engine', () => {
 
   it('runs Healthy Future pathway transformation locally', async () => {
     const mockImg = new Image();
-    mockImg.naturalWidth = 400;
-    mockImg.naturalHeight = 400;
+    mockImg.width = 400;
+    mockImg.height = 400;
+    Object.defineProperty(mockImg, 'naturalWidth', { value: 400 });
+    Object.defineProperty(mockImg, 'naturalHeight', { value: 400 });
 
     const result = await proceduralEngine.transform(mockImg, {
       pathway: 'healthy',
