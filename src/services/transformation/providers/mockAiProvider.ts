@@ -85,12 +85,25 @@ export class MockAiProvider implements ITransformationProvider {
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imgData.data;
 
-    // Apply high-detail mathematical simulation based on effective strength
+    // Detect face position to anchor anatomical features dynamically
+    let centerX = canvas.width * 0.5;
+    let centerY = canvas.height * 0.48;
+    let maxDist = Math.max(canvas.width, canvas.height) * 0.38;
+
+    try {
+      const analysis = await this.analyzeFace(imgElement);
+      if (analysis.faceDetected && analysis.boundingBox) {
+        const scaleX = canvas.width / (imgElement.naturalWidth || canvas.width);
+        const scaleY = canvas.height / (imgElement.naturalHeight || canvas.height);
+        centerX = (analysis.boundingBox.x + analysis.boundingBox.width * 0.50) * scaleX;
+        centerY = (analysis.boundingBox.y + analysis.boundingBox.height * 0.48) * scaleY;
+        maxDist = (analysis.boundingBox.width * 0.55) * scaleX;
+      }
+    } catch {
+      // Fallback to centered face geometry
+    }
+
     const w = canvas.width;
-    const h = canvas.height;
-    const centerX = w * 0.5;
-    const centerY = h * 0.45;
-    const maxDist = Math.max(w, h) * 0.5;
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i]!;
@@ -190,21 +203,21 @@ export class MockAiProvider implements ITransformationProvider {
         const sy = centerY + rDist * maxDist * Math.sin(angle) * 1.1;
         const rad = 2.5 + rng(seed + sIdx * 19) * 3.5;
 
-        // Inflamed red halo
-        const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad * 2.2);
-        haloGrad.addColorStop(0, `rgba(185, 28, 28, ${0.45 * effectiveStrength})`);
-        haloGrad.addColorStop(0.6, `rgba(153, 27, 27, ${0.25 * effectiveStrength})`);
-        haloGrad.addColorStop(1, 'rgba(153, 27, 27, 0)');
+        // Subtle erythematous halo (natural warm vascular redness)
+        const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad * 2.0);
+        haloGrad.addColorStop(0, `rgba(165, 42, 42, ${0.30 * effectiveStrength})`);
+        haloGrad.addColorStop(0.6, `rgba(130, 35, 35, ${0.15 * effectiveStrength})`);
+        haloGrad.addColorStop(1, 'rgba(130, 35, 35, 0)');
         ctx.fillStyle = haloGrad;
         ctx.beginPath();
-        ctx.arc(sx, sy, rad * 2.2, 0, Math.PI * 2);
+        ctx.arc(sx, sy, rad * 2.0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Dark dried scab core
+        // Dark dried scab core (organic brown-maroon)
         const scabGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad);
-        scabGrad.addColorStop(0, `rgba(69, 10, 10, ${0.85 * effectiveStrength})`);
-        scabGrad.addColorStop(0.7, `rgba(88, 28, 28, ${0.70 * effectiveStrength})`);
-        scabGrad.addColorStop(1, 'rgba(88, 28, 28, 0)');
+        scabGrad.addColorStop(0, `rgba(50, 18, 15, ${0.75 * effectiveStrength})`);
+        scabGrad.addColorStop(0.7, `rgba(75, 28, 24, ${0.55 * effectiveStrength})`);
+        scabGrad.addColorStop(1, 'rgba(75, 28, 24, 0)');
         ctx.fillStyle = scabGrad;
         ctx.beginPath();
         ctx.arc(sx, sy, rad, 0, Math.PI * 2);

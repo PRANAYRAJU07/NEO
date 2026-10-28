@@ -94,6 +94,7 @@ export interface ImageValidationResult {
 export interface FaceAnalysisResult {
   faceDetected: boolean;
   confidence: number;
+  boundingBox?: { x: number; y: number; width: number; height: number };
   aspectRatio: number;
   isCentered: boolean;
   recommendations: string[];
