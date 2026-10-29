@@ -8,6 +8,13 @@ educational phase profiles, and quality validation thresholds.
 
 import os
 import tempfile
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    # Environment variables still work; python-dotenv is installed by requirements.txt.
+    pass
 from pathlib import Path
 from typing import Dict, Any, List
 
