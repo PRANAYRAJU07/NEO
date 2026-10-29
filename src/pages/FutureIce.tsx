@@ -245,12 +245,12 @@ export const FutureIce: React.FC = () => {
         <div className="space-y-4">
           <LoadingState
             progress={processingProgress}
-            message="Running Generative AI Image-to-Image Inference..."
-            subMessage={`Conditioning: ${activeProfile.label} • Denoising Strength: ${effectiveStrength} • SDXL Pipeline`}
+            message="Preparing your visualization…"
+            subMessage={`Conditioning: ${activeProfile.label} • Latent Strength: ${effectiveStrength}`}
             privacyBadge={
               activeProviderId === 'server-gpu'
-                ? 'Zero Persistent Storage • Private Ephemeral In-Memory Inference'
-                : 'Zero Network Egress • Offline On-Device Simulation'
+                ? 'Zero Persistent Storage • Private In-Memory Inference'
+                : 'Zero Network Egress • Local Processing'
             }
           />
           <div className="flex justify-center">

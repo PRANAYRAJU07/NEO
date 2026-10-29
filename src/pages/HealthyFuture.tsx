@@ -82,7 +82,7 @@ export const HealthyFuture: React.FC = () => {
       {isProcessing && (
         <LoadingState
           progress={processingProgress}
-          message="Generating Illustrative Vitality Enhancement..."
+          message="Preparing your visualization…"
           subMessage="Applying subtle generative health and hydration conditioning."
         />
       )}

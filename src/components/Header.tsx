@@ -22,11 +22,11 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
-        {/* Top Slogan Ribbon */}
-        <div className="bg-gradient-to-r from-sky-900 via-sky-700 to-amber-600 text-white text-[11px] sm:text-xs font-bold tracking-wider py-1 px-4 text-center flex items-center justify-center gap-3">
+      <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#07090e]/95 backdrop-blur-md">
+        {/* Top Slogan Ribbon (Quiet, Editorial) */}
+        <div className="border-b border-white/[0.05] bg-[#05070a] text-slate-400 text-[11px] font-mono tracking-wider py-1.5 px-4 text-center flex items-center justify-center gap-3">
           <span>{APP_CONFIG.slogans.primary}</span>
-          <span className="opacity-60">•</span>
+          <span className="text-slate-600">•</span>
           <span>{APP_CONFIG.slogans.secondary}</span>
         </div>
 
@@ -34,21 +34,21 @@ export const Header: React.FC = () => {
           {/* Logo & Campaign title */}
           <Link
             to="/"
-            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-sky-500 rounded-lg p-1"
+            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg p-1"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-black text-xl group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.04] flex items-center justify-center text-white font-mono text-sm font-semibold tracking-tighter group-hover:border-sky-400 transition-colors">
               N
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-sky-300 transition-colors">
+                <span className="font-medium text-base tracking-tight text-white group-hover:text-slate-200 transition-colors">
                   NEO
                 </span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-sky-950/80 border border-sky-800/60 text-sky-300 font-semibold hidden sm:inline-block">
+                <span className="text-[10px] px-2 py-0.5 rounded border border-white/10 text-slate-400 font-mono tracking-wider uppercase hidden sm:inline-block">
                   Face the Future
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">
+              <p className="text-[10px] text-slate-500 font-mono tracking-wide">
                 Australian Anti Ice Campaign
               </p>
             </div>
@@ -60,32 +60,32 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowEngineModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-700/80 text-sky-400 hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 hover:text-white border border-white/10 hover:border-white/20 bg-white/[0.02] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400"
               title="Click to view generative AI engine provenance & privacy architecture"
             >
-              <Cpu className="w-3.5 h-3.5" />
+              <Cpu className="w-3.5 h-3.5 text-sky-400" />
               <span>{engineInfo.type === 'server-gpu' ? 'GPU AI Engine' : 'AI Engine Info'}</span>
             </button>
 
             {/* Privacy indicator */}
             <div
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-950/40 border border-emerald-800/40 text-emerald-400"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border border-white/10 bg-white/[0.02] text-slate-400"
               title="Zero uploads: selfies never leave this device"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>Zero-Upload Guarantee</span>
             </div>
 
             {/* Help Link */}
             <Link
               to="/help"
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400 ${
                 location.pathname === '/help'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'bg-slate-900 text-slate-200 hover:text-white hover:bg-slate-800 border border-slate-800'
+                  ? 'bg-white text-slate-950 font-bold'
+                  : 'bg-white/[0.04] text-slate-200 hover:text-white hover:bg-white/[0.08] border border-white/10'
               }`}
             >
-              <HeartHandshake className="w-4 h-4 text-amber-400" />
+              <HeartHandshake className="w-3.5 h-3.5 text-amber-400" />
               <span>Get Help Today</span>
             </Link>
 
@@ -94,10 +94,10 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-red-950/30 text-slate-300 hover:text-red-300 border border-slate-800 hover:border-red-800/40 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-red-400 border border-white/10 hover:border-red-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
                 title="Purge temporary images and start over"
               >
-                <RotateCcw className="w-4 h-4 text-red-400" />
+                <RotateCcw className="w-3.5 h-3.5 text-red-400" />
                 <span>Reset</span>
               </button>
             )}
@@ -109,53 +109,53 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(true)}
-                className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:text-red-300"
+                className="p-2 rounded-lg border border-white/10 text-red-400 hover:text-red-300"
                 aria-label="Reset"
                 title="Reset"
               >
-                <RotateCcw className="w-5 h-5" />
+                <RotateCcw className="w-4 h-4" />
               </button>
             )}
             <Link
               to="/help"
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-amber-400"
+              className="p-2 rounded-lg border border-white/10 text-amber-400"
               aria-label="Get Help Today"
             >
-              <HeartHandshake className="w-5 h-5" />
+              <HeartHandshake className="w-4 h-4" />
             </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="p-2 rounded-lg border border-white/10 text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-3">
+          <div className="md:hidden border-t border-white/10 bg-[#07090e] px-4 py-4 space-y-3 animate-fade-in">
             <button
               type="button"
               onClick={() => {
                 setMobileMenuOpen(false);
                 setShowEngineModal(true);
               }}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-sky-400 font-medium"
+              className="w-full flex items-center justify-between p-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300 hover:text-white"
             >
               <span className="flex items-center gap-2">
-                <Cpu className="w-4 h-4" />
+                <Cpu className="w-4 h-4 text-sky-400" />
                 <span>Engine Provenance & Privacy</span>
               </span>
-              <span className="text-xs bg-sky-950 text-sky-300 px-2 py-0.5 rounded border border-sky-800">100% Local</span>
+              <span className="text-[10px] text-slate-400 px-2 py-0.5 rounded border border-white/10">100% Local</span>
             </button>
 
             <Link
               to="/help"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-sm text-amber-300 font-semibold"
+              className="w-full flex items-center gap-2 p-2.5 rounded-xl border border-white/10 text-xs font-medium text-slate-200 hover:text-white"
             >
               <HeartHandshake className="w-4 h-4 text-amber-400" />
               <span>Get Help Today (AAIC & National Hotlines)</span>
@@ -168,7 +168,7 @@ export const Header: React.FC = () => {
                   setMobileMenuOpen(false);
                   setShowResetConfirm(true);
                 }}
-                className="w-full flex items-center gap-2 p-2.5 rounded-xl bg-red-950/30 border border-red-800/40 text-sm text-red-300 font-semibold"
+                className="w-full flex items-center gap-2 p-2.5 rounded-xl border border-red-500/20 text-xs text-red-300 hover:text-red-200"
               >
                 <RotateCcw className="w-4 h-4 text-red-400" />
                 <span>Reset Experience & Purge Photo</span>

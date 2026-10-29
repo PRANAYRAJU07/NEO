@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  HeartHandshake,
   Phone,
   Globe,
   CheckCircle2,
@@ -24,26 +23,25 @@ export const Help: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 space-y-8 animate-fade-in">
       {/* Title */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-semibold">
-          <HeartHandshake className="w-4 h-4" />
-          <span>Verified Support & Crisis Services</span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
+        <span className="text-xs font-mono uppercase tracking-widest text-sky-400 font-semibold">
+          Support & Care Directory
+        </span>
+        <h1 className="text-3xl sm:text-5xl font-light tracking-tight text-white">
           Get Help Today
         </h1>
-        <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed font-normal">
           If you or someone you care about is impacted by crystal methamphetamine (ice), alcohol, or other substances, compassionate and confidential support is available 24/7 across Australia.
         </p>
       </div>
 
       {/* Immediate Crisis Callout */}
-      <div className="rounded-2xl bg-gradient-to-r from-red-950/40 via-slate-900 to-red-950/40 border border-red-500/30 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="rounded-2xl bg-red-950/20 border border-red-500/30 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 text-center sm:text-left">
-          <div className="w-12 h-12 rounded-xl bg-red-950 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
-            <LifeBuoy className="w-6 h-6 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-red-950/50 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
+            <LifeBuoy className="w-5 h-5 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">Immediate Medical Emergency?</h3>
+            <h3 className="text-base font-semibold text-white">Immediate Medical Emergency?</h3>
             <p className="text-xs text-slate-300">
               If someone is in acute danger, unconscious, or needs urgent medical care, call Emergency Services immediately.
             </p>
@@ -51,7 +49,7 @@ export const Help: React.FC = () => {
         </div>
         <a
           href="tel:000"
-          className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm whitespace-nowrap shadow-lg shadow-red-950/50 flex items-center gap-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
+          className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs uppercase tracking-wider whitespace-nowrap shadow-lg shadow-red-950/40 flex items-center gap-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
         >
           <Phone className="w-4 h-4" />
           <span>Call 000 (Triple Zero)</span>
@@ -71,10 +69,10 @@ export const Help: React.FC = () => {
             key={tab.id}
             type="button"
             onClick={() => setSelectedCategory(tab.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wide border transition-colors ${
               selectedCategory === tab.id
-                ? 'bg-sky-600 border-sky-500 text-white shadow-md'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                ? 'bg-white text-slate-950 border-white font-bold'
+                : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:border-white/20'
             }`}
           >
             {tab.label}
@@ -87,44 +85,44 @@ export const Help: React.FC = () => {
         {filteredContacts.map((contact: AAICSupportContact) => (
           <div
             key={contact.id}
-            className="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex flex-col justify-between gap-4 hover:border-slate-700 transition-colors shadow-lg"
+            className="rounded-2xl bg-white/[0.02] border border-white/10 p-5 flex flex-col justify-between gap-4 hover:border-white/20 transition-colors"
           >
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-bold text-base text-white">{contact.name}</h3>
+                <h3 className="font-medium text-base text-white">{contact.name}</h3>
                 {contact.isVerified ? (
                   <span
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 shrink-0"
+                    className="inline-flex items-center gap-1 text-[10px] font-mono font-medium px-2 py-0.5 rounded border border-white/10 text-emerald-400 shrink-0"
                     title={contact.verificationNotes || 'Verified against Australian public health registry'}
                   >
-                    <CheckCircle2 className="w-3 h-3" />
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                     <span>Verified</span>
                   </span>
                 ) : (
                   <span
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-800/60 text-amber-300 shrink-0"
+                    className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded border border-white/10 text-slate-400 shrink-0"
                   >
                     <HelpCircle className="w-3 h-3" />
-                    <span>Pending AAIC Confirmation</span>
+                    <span>Community Resource</span>
                   </span>
                 )}
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-400 leading-relaxed font-normal">
                 {contact.description}
               </p>
 
-              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium pt-1">
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-mono pt-1">
                 <Clock className="w-3.5 h-3.5 text-sky-400" />
                 <span>{contact.operatingHours}</span>
               </div>
             </div>
 
             {/* Action Buttons for this Contact */}
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+            <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
               <a
                 href={`tel:${contact.phone.replace(/\s+/g, '')}`}
-                className="flex-1 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                className="flex-1 py-2 px-3 rounded-lg bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>Call {contact.phone}</span>
@@ -134,12 +132,12 @@ export const Help: React.FC = () => {
                 href={contact.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 border border-slate-700 transition-colors"
+                className="py-2 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1 border border-white/10 transition-colors"
                 title={`Visit ${contact.website}`}
               >
                 <Globe className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Website</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
+                <ExternalLink className="w-3 h-3 opacity-60" />
               </a>
             </div>
           </div>

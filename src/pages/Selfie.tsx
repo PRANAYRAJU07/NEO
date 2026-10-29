@@ -98,30 +98,33 @@ export const Selfie: React.FC = () => {
     <div className="w-full max-w-3xl mx-auto px-4 py-8 sm:py-12 space-y-8 animate-fade-in">
       {/* Title */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
+        <span className="text-xs font-mono uppercase tracking-widest text-sky-400 font-semibold">
+          Step 01 / Image Selection
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-white">
           Select or Capture Your Photo
         </h1>
-        <p className="text-sm text-slate-300 max-w-lg mx-auto">
-          Choose a clear, front-facing photo with good lighting. Your photo remains strictly on this device and will never be uploaded.
+        <p className="text-sm text-slate-400 max-w-lg mx-auto font-normal leading-relaxed">
+          Select a clear, front-facing portrait with natural lighting. Your photo should be processed locally when local mode is active. Check the current mode before continuing.
         </p>
       </div>
 
       {/* Main Card */}
-      <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div className="rounded-2xl bg-white/[0.02] border border-white/10 p-6 sm:p-8 space-y-6 shadow-2xl">
         {/* If Photo is Selected -> Show Preview & Actions */}
         {photo ? (
           <div className="space-y-6">
             <div className="text-center space-y-1">
-              <span className="text-xs uppercase font-bold text-sky-400 tracking-wider">
+              <span className="text-xs uppercase font-mono text-slate-400 tracking-wider">
                 Photo Ready for Local Exploration
               </span>
-              <p className="text-xs text-slate-400">
-                Source: {photo.source === 'camera' ? 'Webcam Capture' : photo.source === 'sample' ? 'Illustrative Demo Avatar' : 'Device Photo'} ({photo.width}×{photo.height}px)
+              <p className="text-xs text-slate-500 font-mono">
+                Source: {photo.source === 'camera' ? 'Camera Capture' : photo.source === 'sample' ? 'Illustrative Demo Avatar' : 'Device Photo'} ({photo.width}×{photo.height}px)
               </p>
             </div>
 
             {/* Preview image */}
-            <div className="relative w-64 h-64 mx-auto rounded-2xl overflow-hidden border-2 border-sky-500/40 shadow-xl bg-slate-950">
+            <div className="relative w-64 h-64 mx-auto rounded-2xl overflow-hidden border border-white/20 shadow-xl bg-black">
               <img
                 src={photo.blobUrl}
                 alt="Selected baseline photo"
@@ -144,18 +147,18 @@ export const Selfie: React.FC = () => {
                 size="lg"
                 variant="primary"
                 onClick={() => navigate('/future-ice')}
-                rightIcon={<ArrowRight className="w-5 h-5" />}
-                className="w-full sm:w-auto"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="w-full sm:w-auto px-6"
               >
                 Explore &ldquo;My Future with Ice&rdquo;
               </PrimaryButton>
 
               <PrimaryButton
                 size="lg"
-                variant="healthy"
+                variant="outline"
                 onClick={() => navigate('/healthy-future')}
-                leftIcon={<Sparkles className="w-5 h-5" />}
-                className="w-full sm:w-auto"
+                leftIcon={<Sparkles className="w-4 h-4 text-sky-400" />}
+                className="w-full sm:w-auto px-6 border-white/20 text-slate-200 hover:text-white hover:border-white/40"
               >
                 Explore &ldquo;My Healthy Future&rdquo;
               </PrimaryButton>
@@ -176,18 +179,19 @@ export const Selfie: React.FC = () => {
           /* Selection Options Tabs (Upload / Camera / Sample) */
           <div className="space-y-6">
             {/* Tabs */}
-            <div className="flex items-center justify-center p-1 rounded-2xl bg-slate-950 border border-slate-800">
+            <div className="flex items-center justify-center p-1 rounded-xl bg-black/40 border border-white/10">
               <button
                 type="button"
                 onClick={() => setActiveTab('upload')}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                aria-label="Upload Photo"
+                className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all ${
                   activeTab === 'upload'
-                    ? 'bg-sky-600 text-white shadow-md'
+                    ? 'bg-white text-slate-950 font-semibold shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Upload className="w-4 h-4" />
-                <span>Upload Photo</span>
+                <span>Choose a photo</span>
               </button>
 
               <button
@@ -196,27 +200,28 @@ export const Selfie: React.FC = () => {
                   setActiveTab('camera');
                   setShowCameraModal(true);
                 }}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                aria-label="Take Selfie"
+                className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all ${
                   activeTab === 'camera'
-                    ? 'bg-sky-600 text-white shadow-md'
+                    ? 'bg-white text-slate-950 font-semibold shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Camera className="w-4 h-4" />
-                <span>Take Selfie</span>
+                <span>Use camera</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveTab('sample')}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all ${
                   activeTab === 'sample'
-                    ? 'bg-sky-600 text-white shadow-md'
+                    ? 'bg-white text-slate-950 font-semibold shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <UserCheck className="w-4 h-4" />
-                <span>Demo Avatars</span>
+                <span>Demo avatars</span>
               </button>
             </div>
 
@@ -235,21 +240,21 @@ export const Selfie: React.FC = () => {
 
                 <label
                   htmlFor="selfie-file-input"
-                  className="w-full border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer bg-slate-950/40 hover:bg-slate-950/80 transition-all text-center group"
+                  className="w-full border border-dashed border-white/20 hover:border-sky-400 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer bg-white/[0.01] hover:bg-white/[0.03] transition-all text-center group"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-sky-950/60 border border-sky-800/60 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
-                    <Upload className="w-7 h-7" />
+                  <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 group-hover:scale-105 transition-transform">
+                    <Upload className="w-5 h-5 text-sky-400" />
                   </div>
                   <div>
-                    <span className="text-base font-bold text-white group-hover:text-sky-300">
-                      Click to Browse Photo
+                    <span className="text-sm font-medium text-white group-hover:text-slate-200">
+                      Choose a photo
                     </span>
                     <p className="text-xs text-slate-400 mt-1">
-                      JPEG, PNG, or WebP • Up to 10 MB
+                      JPEG, PNG, or WebP • Up to 15 MB
                     </p>
                   </div>
-                  <span className="text-[11px] text-slate-500">
-                    Recommended: Front-facing portrait with neutral lighting
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    Front-facing portrait with natural lighting
                   </span>
                 </label>
               </div>
@@ -257,11 +262,11 @@ export const Selfie: React.FC = () => {
 
             {/* Tab 2: Camera Launch trigger */}
             {activeTab === 'camera' && (
-              <div className="p-8 text-center space-y-4 border border-slate-800 rounded-3xl bg-slate-950/40">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-sky-950/60 border border-sky-800/60 flex items-center justify-center text-sky-400">
-                  <Camera className="w-8 h-8" />
+              <div className="p-8 text-center space-y-4 border border-white/10 rounded-2xl bg-white/[0.01]">
+                <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-sky-400">
+                  <Camera className="w-6 h-6" />
                 </div>
-                <h2 className="text-base font-bold text-white">Live Camera Capture</h2>
+                <h2 className="text-base font-medium text-white">Live Camera Capture</h2>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
                   Click below to open the on-device camera viewfinder. We never store or upload captured stream data.
                 </p>
@@ -270,7 +275,7 @@ export const Selfie: React.FC = () => {
                   onClick={() => setShowCameraModal(true)}
                   leftIcon={<Camera className="w-4 h-4" />}
                 >
-                  Open Camera Viewfinder
+                  Use camera
                 </PrimaryButton>
               </div>
             )}
@@ -314,11 +319,11 @@ export const Selfie: React.FC = () => {
 
             {/* Validation Error Banner */}
             {validationError && (
-              <div className="rounded-2xl bg-red-950/40 border border-red-800/60 p-4 flex items-start gap-3 text-red-200 text-xs sm:text-sm">
+              <div className="rounded-xl bg-red-950/20 border border-red-500/30 p-4 flex items-start gap-3 text-red-200 text-xs sm:text-sm">
                 <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <strong className="font-bold text-red-300">Validation Notice:</strong>
-                  <p>{validationError}</p>
+                  <strong className="font-semibold text-red-300">We couldn&apos;t process this image. Try another photo.</strong>
+                  <p className="text-slate-300 text-xs">{validationError}</p>
                 </div>
               </div>
             )}
