@@ -102,3 +102,34 @@ Expected output:
 2. **Volatile Memory Only**: Neither student selfies nor output illustrations are saved to disk on the server.
 3. **Non-Stigmatising Illustrations**: The transformation depicts educational biological strain (sleep deprivation dark circles, dehydration, gauntness, sallow vascular cast) without sensationalised, degrading, or frightening imagery.
 4. **Educational Disclaimer**: Every output is explicitly designated as an illustrative educational visualization, not a clinical prediction.
+
+
+---
+
+## 7. Real online/offline diffusion mode (desktop)
+
+NEO includes an optional lazy-loaded Diffusers image-to-image adapter in `server/diffusion_engine.py`. It is separate from the procedural fallback and is active only when `NEO_ACTIVE_MODEL` names a real model.
+
+### Online setup (one-time model download)
+
+1. Create and activate the backend Python environment.
+2. Set `NEO_ACTIVE_MODEL=stabilityai/sd-turbo` and `NEO_OFFLINE_MODE=false` in `.env`.
+3. Install dependencies with `pip install -r server/requirements.txt`.
+4. Start the backend and run a transformation while connected. Model files are downloaded to the Hugging Face cache or `NEO_MODEL_CACHE_DIR`.
+5. Check `GET /api/v1/model-status`. A model is not reported as loaded until its first inference succeeds.
+
+### Offline setup
+
+1. Complete the model download while online and verify that a transformation succeeds.
+2. Set `NEO_OFFLINE_MODE=true` and restart the backend.
+3. Disconnect from the internet and run a transformation. The loader uses `local_files_only=True`.
+4. If model files are missing, NEO returns an actionable error; it does not silently substitute filters for the selected diffusion model.
+
+`NEO_MODEL_CACHE_DIR` optionally sets a dedicated cache folder. Keep model weights out of Git; they may occupy several gigabytes. `NEO_DIFFUSION_STEPS` is clamped to 1–8, with a default of 4. Inference is local in both modes: online mode permits model downloads only, not remote image processing.
+
+### Important limitations
+
+- SD-Turbo is image-to-image, not a dedicated identity-preserving inpainting model. Only the detected face mask is composited over the original; this cannot guarantee exact identity or unchanged facial geometry.
+- The default procedural engine is lightweight and works offline, but it is image processing—not generative AI.
+- All stages are educational illustrations, not medical predictions or guaranteed outcomes.
+- CPU-only inference may be slow and memory-intensive. Benchmark on the target desktop before making diffusion the default.

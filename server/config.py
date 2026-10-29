@@ -11,6 +11,13 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Any, List
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    # Environment variables still work; python-dotenv is installed by requirements.txt.
+    pass
+
 # Base Directories
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -29,7 +36,11 @@ JOB_TTL_SECONDS = int(os.environ.get("JOB_TTL_SECONDS", 600))  # 10 minutes
 # Active Model Strategy
 # Available options: 'landmark-physiological-v1', 'stabilityai/sd-turbo', 'runwayml/stable-diffusion-v1-5'
 DEFAULT_MODEL_NAME = os.environ.get("NEO_ACTIVE_MODEL", "landmark-physiological-v1")
+# Online mode may download weights once; offline mode forbids network access during model loading.
 FORCE_OFFLINE_MODE = os.environ.get("NEO_OFFLINE_MODE", "true").lower() in ("true", "1", "yes")
+DIFFUSION_STEPS = max(1, min(8, int(os.environ.get("NEO_DIFFUSION_STEPS", "4"))))
+DIFFUSION_MODEL_CACHE = os.environ.get("NEO_MODEL_CACHE_DIR", "").strip() or None
+ALLOW_PROCEDURAL_FALLBACK = os.environ.get("NEO_ALLOW_PROCEDURAL_FALLBACK", "false").lower() in ("true", "1", "yes")
 
 # Quality Validation Thresholds
 QUALITY_THRESHOLDS = {
