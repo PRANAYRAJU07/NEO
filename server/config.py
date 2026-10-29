@@ -31,7 +31,7 @@ JOB_TTL_SECONDS = int(os.environ.get("JOB_TTL_SECONDS", 600))  # 10 minutes
 DEFAULT_MODEL_NAME = os.environ.get("NEO_ACTIVE_MODEL", "landmark-physiological-v1")
 # Online mode may download weights once; offline mode forbids network access during model loading.
 FORCE_OFFLINE_MODE = os.environ.get("NEO_OFFLINE_MODE", "true").lower() in ("true", "1", "yes")
-DIFFUSION_STEPS = max(1, min(8, int(os.environ.get("NEO_DIFFUSION_STEPS", "4")))
+DIFFUSION_STEPS = max(1, min(8, int(os.environ.get("NEO_DIFFUSION_STEPS", "4"))))
 DIFFUSION_MODEL_CACHE = os.environ.get("NEO_MODEL_CACHE_DIR", "").strip() or None
 ALLOW_PROCEDURAL_FALLBACK = os.environ.get("NEO_ALLOW_PROCEDURAL_FALLBACK", "false").lower() in ("true", "1", "yes")
 
