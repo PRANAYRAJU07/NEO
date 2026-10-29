@@ -14,6 +14,7 @@ export interface TransformationOptions {
   seed?: number;
   preserveIdentity?: boolean;
   abortSignal?: AbortSignal;
+  onProgress?: (progressPct: number, milestone: string) => void;
 }
 
 export interface StagePromptProfile {

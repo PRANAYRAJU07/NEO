@@ -129,23 +129,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       setIsProcessing(true);
-      setProcessingProgress(20);
+      setProcessingProgress(15);
       setError(null);
 
       try {
-        // Progress simulation for user feedback
-        const progressTimer = setInterval(() => {
-          setProcessingProgress((prev) => (prev < 85 ? prev + 15 : prev));
-        }, 120);
-
         const result = await transformationManager.process(photo, {
           pathway,
           intensity: level,
           stage,
           seed,
+          onProgress: (pct: number) => {
+            setProcessingProgress(pct);
+          },
         });
 
-        clearInterval(progressTimer);
         setProcessingProgress(100);
         setEngineInfo(transformationManager.getEngineInfo());
         setActiveProviderIdState(transformationManager.getActiveProvider().id);

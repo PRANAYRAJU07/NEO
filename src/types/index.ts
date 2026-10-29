@@ -93,9 +93,18 @@ export interface ImageValidationResult {
 
 export interface FaceAnalysisResult {
   faceDetected: boolean;
+  faceCount?: number;
   confidence: number;
   boundingBox?: { x: number; y: number; width: number; height: number };
   aspectRatio: number;
   isCentered: boolean;
+  qualityMetrics?: {
+    blurVariance: number;
+    isBlurry: boolean;
+    meanLuminance: number;
+    isUnderexposed: boolean;
+    isOverexposed: boolean;
+    qualityScore: number;
+  };
   recommendations: string[];
 }

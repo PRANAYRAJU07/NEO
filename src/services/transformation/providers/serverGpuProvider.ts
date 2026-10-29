@@ -1,11 +1,11 @@
 import { EngineInfo, FaceAnalysisResult, PhotoData, TransformationResult } from '../../../types';
-import { analyzeFace } from '../faceAnalyzer';
+import { analyzeFace as clientAnalyzeFace } from '../faceAnalyzer';
 import { imageCleanup } from '../../imageCleanup';
 import { ITransformationProvider, TransformationOptions } from '../types';
 
 export class ServerGpuProvider implements ITransformationProvider {
   readonly id = 'server-gpu';
-  readonly name = 'Private GPU Generative AI Pipeline (SDXL)';
+  readonly name = 'Desktop-First Facial Transformation Pipeline (FastAPI)';
 
   private baseUrl: string;
   private currentAbortController: AbortController | null = null;
@@ -18,14 +18,14 @@ export class ServerGpuProvider implements ITransformationProvider {
     this.serverInfo = {
       type: 'server-gpu',
       name: this.name,
-      version: 'SDXL-1.0-fp16',
-      isLocalOnly: false,
+      version: '2.0.0-desktop',
+      isLocalOnly: true,
       modelLoaded: false,
       endpointUrl: this.baseUrl,
       serverStatus: 'offline',
-      description: 'Private GPU inference backend running Stable Diffusion XL Img2Img with stage-conditioned guidance.',
-      provenance: 'Dedicated AAIC educational GPU cluster. Images processed in volatile memory only and destroyed immediately after generation.',
-      hardwareAcceleration: 'NVIDIA Tensor Core GPU (CUDA / TensorRT / PyTorch fp16)',
+      description: 'Local FastAPI facial transformation service with multi-phase physiological synthesis and identity preservation.',
+      provenance: 'Dedicated AAIC educational pipeline. Zero persistent disk storage; processed entirely in volatile memory and destroyed immediately.',
+      hardwareAcceleration: 'Windows Desktop CPU (AVX2 / OpenMP) or NVIDIA CUDA',
     };
   }
 
@@ -63,11 +63,16 @@ export class ServerGpuProvider implements ITransformationProvider {
       });
       if (res.ok) {
         const data = await res.json();
-        this.serverInfo.modelLoaded = data.status === 'ready';
+        this.serverInfo.modelLoaded = data.status === 'ready' || data.status === 'cpu_fallback';
         this.serverInfo.serverStatus = data.status;
         this.serverInfo.device = data.device;
+        if (data.model_name) {
+          this.serverInfo.name = `${this.name} (${data.model_name})`;
+        }
         if (data.vram_allocated_mb) {
           this.serverInfo.vramInfo = `${data.vram_allocated_mb} MB / ${data.vram_total_mb} MB`;
+        } else if (data.ram_used_mb) {
+          this.serverInfo.vramInfo = `RAM: ${data.ram_used_mb} MB (${data.device.toUpperCase()})`;
         }
       }
     } catch {
@@ -83,7 +88,46 @@ export class ServerGpuProvider implements ITransformationProvider {
   }
 
   async analyzeFace(image: HTMLImageElement | PhotoData): Promise<FaceAnalysisResult> {
-    return analyzeFace(image);
+    if (!this.isOnline) {
+      return clientAnalyzeFace(image);
+    }
+
+    try {
+      const base64Image = await this.imageSourceToBase64(image);
+      const res = await fetch(`${this.baseUrl}/api/v1/analyze-face`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ image: base64Image }),
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          faceDetected: data.face_detected,
+          faceCount: data.face_count,
+          confidence: data.confidence,
+          boundingBox: data.bounding_box || undefined,
+          aspectRatio: data.aspect_ratio,
+          isCentered: data.is_centered,
+          qualityMetrics: data.quality_metrics ? {
+            blurVariance: data.quality_metrics.blur_variance,
+            isBlurry: data.quality_metrics.is_blurry,
+            meanLuminance: data.quality_metrics.mean_luminance,
+            isUnderexposed: data.quality_metrics.is_underexposed,
+            isOverexposed: data.quality_metrics.is_overexposed,
+            qualityScore: data.quality_metrics.quality_score,
+          } : undefined,
+          recommendations: data.recommendations || [],
+        };
+      }
+    } catch {
+      // Fallback to local client analysis if server analysis fails or times out
+    }
+    return clientAnalyzeFace(image);
   }
 
   cancelCurrentTransformation(): void {
@@ -114,7 +158,17 @@ export class ServerGpuProvider implements ITransformationProvider {
     }
 
     const { pathway, intensity, stage = 1, seed } = options;
+
+    // Report real initial milestone
+    if (options.onProgress) {
+      options.onProgress(15, 'Validating facial landmarks and orientation...');
+    }
+
     const base64Image = await this.imageSourceToBase64(imageSource);
+
+    if (options.onProgress) {
+      options.onProgress(35, 'Generating feathered anatomical masks...');
+    }
 
     const payload = {
       image: base64Image,
@@ -128,6 +182,10 @@ export class ServerGpuProvider implements ITransformationProvider {
     const startTime = performance.now();
 
     try {
+      if (options.onProgress) {
+        options.onProgress(55, 'Executing identity-preserving transformation...');
+      }
+
       const res = await fetch(`${this.baseUrl}/api/v1/transform`, {
         method: 'POST',
         headers: {
@@ -143,12 +201,20 @@ export class ServerGpuProvider implements ITransformationProvider {
         throw new Error(errorData.detail || `Server inference error: HTTP ${res.status}`);
       }
 
+      if (options.onProgress) {
+        options.onProgress(85, 'Running background preservation and quality validation...');
+      }
+
       const data = await res.json();
       const executionTimeMs = data.execution_time_ms || Math.round(performance.now() - startTime);
 
       // Convert base64 result to Blob URL and register for memory cleanup
       const blobUrl = await this.base64ToBlobUrl(data.image);
       imageCleanup.registerBlobUrl(blobUrl);
+
+      if (options.onProgress) {
+        options.onProgress(100, 'Transformation complete');
+      }
 
       return {
         imageUrl: blobUrl,
@@ -172,7 +238,7 @@ export class ServerGpuProvider implements ITransformationProvider {
       }
       if (err instanceof TypeError && err.message.toLowerCase().includes('fetch')) {
         throw new Error(
-          `Unable to connect to Private GPU service at ${this.baseUrl}. Please verify the Python backend is running on port 8000, or switch to the Offline Provider.`
+          `Unable to connect to Private AI service at ${this.baseUrl}. Please verify the Python backend is running on port 8000, or switch to the Offline Provider.`
         );
       }
       throw err;

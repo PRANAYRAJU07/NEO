@@ -17,20 +17,20 @@ class TransformationManager {
     this.mockProvider = new MockAiProvider();
     this.localCanvasProvider = new CanvasProceduralEngine();
 
-    // Default to ServerGpuProvider (quality-first architecture)
+    // Default to ServerGpuProvider (desktop-first architecture)
     this.activeProvider = this.serverProvider;
   }
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    // Check if private GPU server is online
+    // Check if local FastAPI server is online
     const isServerOnline = await this.serverProvider.initialize();
 
     if (isServerOnline) {
       this.activeProvider = this.serverProvider;
     } else {
-      // If server is not running locally, initialize mock/offline provider for seamless local experience
+      // Server is not running locally; initialize explicit mock/demo provider
       await this.mockProvider.initialize();
       this.activeProvider = this.mockProvider;
     }
@@ -85,18 +85,8 @@ class TransformationManager {
 
   async process(photo: PhotoData, options: TransformationOptions): Promise<TransformationResult> {
     await this.initialize();
-    try {
-      return await this.activeProvider.transform(photo, options);
-    } catch (err) {
-      // If server inference fails (offline, connection error, timeout), smoothly fallback to offline provider
-      if (this.activeProvider.id === 'server-gpu') {
-        console.warn('Server GPU inference unavailable, falling back to offline provider:', err);
-        await this.mockProvider.initialize();
-        this.activeProvider = this.mockProvider;
-        return await this.mockProvider.transform(photo, options);
-      }
-      throw err;
-    }
+    // Execute active provider directly without silent simulation fallback
+    return await this.activeProvider.transform(photo, options);
   }
 
   releaseModelResources(): void {

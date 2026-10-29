@@ -6,7 +6,7 @@ import { ITransformationProvider, TransformationOptions } from '../types';
 
 export class MockAiProvider implements ITransformationProvider {
   readonly id = 'mock-ai';
-  readonly name = 'Verified AI Simulation Provider (Offline / Test)';
+  readonly name = 'Offline Demo Provider (Non-Production Fallback)';
 
   private isInitialized = false;
   private currentAbortController: AbortController | null = null;
@@ -20,11 +20,11 @@ export class MockAiProvider implements ITransformationProvider {
     return {
       type: 'mock-ai',
       name: this.name,
-      version: '1.0.0-test',
+      version: '1.0.0-demo',
       isLocalOnly: true,
       modelLoaded: this.isInitialized,
-      description: 'Deterministic offline test provider validating the SDXL prompt profiles, denoising strengths, and interface contracts.',
-      provenance: 'Internal automated test double. Explicitly non-production AI inference.',
+      description: 'Explicit offline test/demo provider validating UI contracts and layout when the local Python AI backend is offline.',
+      provenance: 'Explicitly labeled development fallback. Not active when Python FastAPI service is online.',
       hardwareAcceleration: 'HTML5 2D Canvas',
     };
   }
