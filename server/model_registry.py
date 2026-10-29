@@ -37,23 +37,22 @@ class ModelRegistryManager:
                 "device_support": ["cpu", "cuda"],
                 "vram_estimate": "< 50 MB (CPU / GPU)",
                 "description": (
-                    "Deterministic, 100% identity-preserving physiological facial engine. "
-                    "Dynamically anchors to anatomical landmarks to apply clinically documented "
-                    "substance toll while locking 100% of subject's identity, features, and framing."
+                    "Lightweight procedural image-processing fallback. Not a generative model; "
+                    "medical accuracy and exact identity preservation are not guaranteed."
                 ),
                 "is_always_available": True,
                 "is_loaded": True
             },
             "stabilityai/sd-turbo": {
                 "model_id": "stabilityai/sd-turbo",
-                "display_name": "Stable Diffusion Turbo (SDXL-Turbo Distilled)",
+                "display_name": "Stable Diffusion Turbo (image-to-image)",
                 "license": "CreativeML OpenRAIL++-M",
                 "type": "Latent Diffusion Image-to-Image / Inpainting",
                 "device_support": ["cpu", "cuda"],
                 "vram_estimate": "5.5 GB (fp16 on CUDA) / 8 GB RAM (CPU)",
                 "description": (
-                    "Fast 1-step distilled latent diffusion model for stage-conditioned "
-                    "photorealistic inpainting with identity mask guidance."
+                    "Optional local image-to-image diffusion model. The generated candidate is "
+                    "composited within the detected face mask; identity is not guaranteed."
                 ),
                 "cache_dir_name": "models--stabilityai--sd-turbo",
                 "is_always_available": False,

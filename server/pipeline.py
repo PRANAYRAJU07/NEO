@@ -20,9 +20,10 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from config import PHASE_PROFILES, QUALITY_THRESHOLDS, DEFAULT_MODEL_NAME
+from config import PHASE_PROFILES, QUALITY_THRESHOLDS, DEFAULT_MODEL_NAME, ALLOW_PROCEDURAL_FALLBACK
 from face_engine import face_engine
 from model_registry import model_registry
+from diffusion_engine import LocalDiffusionEngine, DiffusionModelError
 from schemas import (
     TransformationResponse,
     SeriesTransformationResponse,
@@ -41,6 +42,8 @@ class GenerativePipelineManager:
         self.device = model_registry.device
         self.is_loaded = False
         self.cuda_available = model_registry.cuda_available
+        self.diffusion_engine = None if self.active_model_name == "landmark-physiological-v1" else LocalDiffusionEngine()
+        self.last_model_error: Optional[str] = None
 
     def initialize(self):
         """
@@ -50,8 +53,11 @@ class GenerativePipelineManager:
             model_registry._detect_hardware()
             self.device = model_registry.device
             self.cuda_available = model_registry.cuda_available
-            self.is_loaded = True
-            print(f"[NEO AI] Pipeline initialized on {self.device.upper()}. Identity-preservation active.")
+            self.is_loaded = self.active_model_name == "landmark-physiological-v1"
+            if self.is_loaded:
+                print("[NEO] Procedural local engine ready (not generative AI).")
+            else:
+                print(f"[NEO] Generative model {self.active_model_name} configured; weights load on first inference.")
         except Exception as e:
             print(f"[NEO AI] Generative pipeline initialization warning: {e}")
             self.is_loaded = True
@@ -98,6 +104,49 @@ class GenerativePipelineManager:
         eye_hollow = masks["periorbital_mask"]
         cheek_hollow = masks["cheek_mask"]
         temple_hollow = masks["temple_mask"]
+
+        # Optional real local diffusion inference. Each phase starts from the immutable original.
+        # Only the detected face mask is composited over the source image.
+        if self.active_model_name != "landmark-physiological-v1":
+            try:
+                if self.diffusion_engine is None:
+                    self.diffusion_engine = LocalDiffusionEngine()
+                source_pil = Image.fromarray(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB))
+                effective = self.calculate_effective_strength(
+                    phase_config.get("base_strength", 0.30), intensity
+                )
+                generated_pil = self.diffusion_engine.transform(
+                    image=source_pil,
+                    prompt=phase_config.get("prompt", "photorealistic portrait, preserve identity"),
+                    negative_prompt=phase_config.get("negative_prompt", ""),
+                    strength=effective,
+                    seed=seed,
+                )
+                generated_rgb = np.asarray(generated_pil.convert("RGB"), dtype=np.uint8)
+                generated_bgr = cv2.cvtColor(generated_rgb, cv2.COLOR_RGB2BGR)
+                if generated_bgr.shape[:2] != img_bgr.shape[:2]:
+                    generated_bgr = cv2.resize(generated_bgr, (w, h), interpolation=cv2.INTER_LANCZOS4)
+                alpha = np.clip(face_mask[:, :, None], 0.0, 1.0).astype(np.float32)
+                final_bgr = (
+                    generated_bgr.astype(np.float32) * alpha
+                    + img_bgr.astype(np.float32) * (1.0 - alpha)
+                ).astype(np.uint8)
+                validation = face_engine.validate_quality(img_bgr, final_bgr, face_mask, landmarks)
+                self.is_loaded = True
+                self.last_model_error = None
+                final_rgb = cv2.cvtColor(final_bgr, cv2.COLOR_BGR2RGB)
+                return Image.fromarray(final_rgb), validation, effective
+            except DiffusionModelError as exc:
+                self.last_model_error = str(exc)
+                if not ALLOW_PROCEDURAL_FALLBACK:
+                    raise RuntimeError(
+                        f"Configured local diffusion model could not run: {exc}. "
+                        "For offline use, cache the model while online, or explicitly select "
+                        "NEO_ACTIVE_MODEL=landmark-physiological-v1 for procedural mode."
+                    ) from exc
+                # Fallback is opt-in only and should be disclosed in the response metadata.
+                self.active_model_name = "landmark-physiological-v1"
+                self.diffusion_engine = None
 
         cx, cy = landmarks["cx"], landmarks["cy"]
         face_scale = landmarks["face_scale"]
@@ -268,8 +317,9 @@ class GenerativePipelineManager:
         exec_time_ms = int((time.time() - start_time) * 1000)
 
         notes = (
-            f"Phase {phase_config.get('name')} generated via {self.active_model_name} on {self.device.upper()}. "
-            f"Source identity 100% preserved. Validation passed: {validation.validation_passed} "
+            f"Phase {phase_config.get('name')} processed via {self.active_model_name} on {self.device.upper()}. "
+            f"Output is an illustrative visualization; exact identity preservation is not guaranteed. "
+            f"Validation passed: {validation.validation_passed} "
             f"(BG MSE: {validation.background_mse}, Drift: {validation.landmark_drift_pct}%)."
         )
 
@@ -345,8 +395,13 @@ class GenerativePipelineManager:
         """
         Returns real-time status of the pipeline and model registry.
         """
-        status_resp = model_registry.get_status(self.active_model_name)
-        return status_resp.model_dump()
+        data = model_registry.get_status(self.active_model_name).model_dump()
+        if self.active_model_name != "landmark-physiological-v1":
+            loaded = bool(self.diffusion_engine and self.diffusion_engine.is_loaded)
+            data["status"] = "ready" if loaded else "unloaded"
+            for item in data.get("registry", []):
+                item["is_loaded"] = bool(loaded and item.get("model_id") == self.active_model_name)
+        return data
 
 
 pipeline_manager = GenerativePipelineManager()

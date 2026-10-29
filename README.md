@@ -2,7 +2,7 @@
 ### Australian Anti Ice Campaign (AAIC) • Generative AI Youth Prevention Experience
 
 [![Test Suite](https://img.shields.io/badge/tests-49%20passed%20(42%20vitest%20%2B%207%20server)-emerald)]()
-[![Model](https://img.shields.io/badge/model-SDXL%20Img2Img%20(fp16)-purple)]()
+[![Model](https://img.shields.io/badge/model-Optional%20Local%20Diffusion-purple)]()
 [![Privacy](https://img.shields.io/badge/privacy-ephemeral%20RAM%20only%20%2F%20zero%20storage-blue)]()
 [![TypeScript](https://img.shields.io/badge/typescript-strict-indigo)]()
 [![FastAPI](https://img.shields.io/badge/backend-FastAPI%20Diffusers-teal)]()
@@ -16,8 +16,8 @@
 
 **NEO – Face the Future** is an educational web application developed for the **Australian Anti Ice Campaign (AAIC)**. Its mission is to educate Australian youth about the devastating physical, psychological, and social toll of crystal methamphetamine (*ice*), while presenting an encouraging, life-affirming alternative: **My Healthy Future**.
 
-### Generative AI Upgrade
-Rather than relying on superficial canvas overlays, contrast adjustments, or blur filters, NEO incorporates a **genuine generative AI image-to-image pipeline** powered by **Stable Diffusion XL (SDXL)**. The pipeline synthesizes photorealistic, identity-preserving educational illustrations across progressive timeline scenarios, grounded in dermatological and clinical indicators.
+### Transformation modes
+The default engine is a lightweight procedural image-processing fallback. An optional local Diffusers image-to-image model can be enabled after its weights are downloaded. Do not assume a generative model is loaded merely because it is configured; check the backend model-status endpoint. Outputs are illustrative and do not guarantee identity preservation or represent medical predictions.
 
 ### Core Architectural Tenets
 1. **Genuine Latent Image-to-Image Synthesis**: Uses Stable Diffusion XL image conditioning. Pose, facial landmarks, clothing, hairstyle, and background are preserved via low-to-moderate latent denoising ($0.18 - 0.60$), altering only dermal texture, skin tone, subcutaneous volume, and orbital fatigue.
@@ -28,9 +28,9 @@ Rather than relying on superficial canvas overlays, contrast adjustments, or blu
 
 ---
 
-## 2. Generative AI Engine: Model Selection & Technical Provenance
+## 2. Optional Local Diffusion Engine
 
-### Model Selected: Stable Diffusion XL Base 1.0 (`stabilityai/stable-diffusion-xl-base-1.0`)
+### Optional model: Stable Diffusion Turbo (`stabilityai/sd-turbo`)
 - **Pipeline**: `AutoPipelineForImage2Image` via Hugging Face `diffusers` (PyTorch `float16`).
 - **Input**: User-consented selfie, stage conditioning prompt, calibrated denoising strength, guidance scale ($5.0 - 6.5$), and optional reproducible seed.
 - **Output**: 8K-styled photorealistic documentary portrait with identity-preserved facial geometry and biologically coherent substance toll or healthy vitality.
@@ -65,7 +65,7 @@ blurry, oversaturated, deformed eyes, extra limbs, bad anatomy"
 
 ## 3. Architecture & Inference Providers
 
-The transformation architecture is decoupled via the `ITransformationProvider` interface:
+The transformation architecture is decoupled via the `ITransformationProvider` interface. The procedural and diffusion paths are reported separately; the diffusion path is only marked loaded after successful inference:
 
 ```
                             [ AppContext / React UI ]
@@ -234,3 +234,17 @@ For Australian students or educators seeking confidential information, counselli
 - **Lifeline Australia**: `13 11 14` (24/7 crisis support)
 - **headspace**: `1800 650 890` (youth mental health support)
 - **Emergency Services**: `000` (Triple Zero)
+
+
+---
+
+## Desktop online/offline inference
+
+NEO has two explicitly different local modes:
+
+- **Procedural mode (default):** `NEO_ACTIVE_MODEL=landmark-physiological-v1`. Lightweight and offline, but it is image processing, not generative AI.
+- **Local diffusion mode:** `NEO_ACTIVE_MODEL=stabilityai/sd-turbo`. Runs a real Diffusers image-to-image model locally once its weights are available.
+
+For first-time model setup, set `NEO_OFFLINE_MODE=false`, start the backend, and run a transformation while connected. Then set `NEO_OFFLINE_MODE=true` and restart to require cached weights and block model downloads. User images are not sent to a cloud inference service in either mode. See [server/MODEL_GUIDE.md](server/MODEL_GUIDE.md).
+
+**Honest status:** model configuration is not proof that it loaded. Diffusion is marked available only after inference succeeds. Missing weights in offline mode produce an actionable error instead of a silent mock fallback.
