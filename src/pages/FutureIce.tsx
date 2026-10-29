@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Dices,
+  Layers,
 } from 'lucide-react';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { EducationalDisclaimer } from '../components/EducationalDisclaimer';
@@ -189,17 +190,19 @@ export const FutureIce: React.FC = () => {
   const activeProfile = STAGE_PROFILES.ice[currentStage] || STAGE_PROFILES.ice[1]!;
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6 animate-fade-in">
-      {/* Title & Campaign Ribbon */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-semibold">
-          <AlertTriangle className="w-3.5 h-3.5" />
+    <div className="w-full max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6 animate-fade-in relative">
+      {/* Title & Scientific Campaign Ribbon */}
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-red-950/70 border border-red-500/40 text-red-300 text-xs font-mono font-semibold tracking-wider shadow-glow-red/20 animate-pulse-slow">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+          <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
           <span>Generative AI Substance Toll Simulation</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
+
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           My Future with Ice (Simulated)
         </h1>
-        <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
           Stage-conditioned generative AI illustration demonstrating the cumulative physical toll of crystal methamphetamine over time, while strictly preserving your facial geometry.
         </p>
       </div>
@@ -207,14 +210,16 @@ export const FutureIce: React.FC = () => {
       {/* Top Educational Disclaimer */}
       <EducationalDisclaimer compact />
 
-      {/* Provider & Hardware Status Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
-        <div className="flex items-center gap-2">
-          <Cpu className="w-4 h-4 text-sky-400 shrink-0" />
-          <span className="font-semibold text-white">AI Provider:</span>
-          <span className="font-mono text-sky-300">{engineInfo.name}</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400">
-            {engineInfo.isLocalOnly ? 'Local Simulation' : 'Private GPU'}
+      {/* High-Tech Telemetry & Hardware Status Bar */}
+      <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-white/10 text-xs text-slate-300 shadow-xl">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-lg bg-sky-950 border border-sky-500/40 flex items-center justify-center shrink-0">
+            <Cpu className="w-3.5 h-3.5 text-sky-400" />
+          </div>
+          <span className="font-semibold text-white">AI Engine:</span>
+          <span className="font-mono text-sky-300 font-medium">{engineInfo.name}</span>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-400">
+            {engineInfo.isLocalOnly ? 'Local Sandbox' : 'Private GPU'}
           </span>
         </div>
 
@@ -222,20 +227,20 @@ export const FutureIce: React.FC = () => {
           <button
             type="button"
             onClick={handleRerollSeed}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-300 hover:text-amber-200"
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-amber-300 hover:text-amber-200 transition-colors group"
             title="Re-roll generation seed"
           >
-            <Dices className="w-3.5 h-3.5" />
+            <Dices className="w-4 h-4 text-amber-400 group-hover:rotate-180 transition-transform duration-500" />
             <span>Re-roll Seed</span>
           </button>
-          <span className="text-slate-600">•</span>
+          <span className="text-slate-600 font-mono">•</span>
           <button
             type="button"
             onClick={handleProviderToggle}
-            className="text-[11px] font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-2"
+            className="text-xs font-mono font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-4 transition-colors"
             title="Toggle between Private GPU Server and Offline Test Provider"
           >
-            Switch to {activeProviderId === 'server-gpu' ? 'Offline Provider' : 'GPU Server'}
+            Switch to {activeProviderId === 'server-gpu' ? 'Offline Sandbox' : 'GPU Server'}
           </button>
         </div>
       </div>
@@ -257,7 +262,7 @@ export const FutureIce: React.FC = () => {
             <button
               type="button"
               onClick={cancelTransformation}
-              className="text-xs text-red-400 hover:text-red-300 underline underline-offset-4"
+              className="text-xs font-mono text-red-400 hover:text-red-300 underline underline-offset-4"
             >
               Cancel Generation
             </button>
@@ -288,7 +293,7 @@ export const FutureIce: React.FC = () => {
                 }}
                 className="px-4 py-2 rounded-xl bg-sky-950/80 border border-sky-700/60 text-xs font-semibold text-sky-300 hover:bg-sky-900 transition-colors shadow-lg"
               >
-                Switch to Offline Simulation Provider & Continue
+                Switch to Offline Simulation Provider &amp; Continue
               </button>
             </div>
           )}
@@ -300,7 +305,7 @@ export const FutureIce: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Visual Split Slider & 4-Stage Thumbnails */}
           <div className="lg:col-span-6 space-y-4">
-            {/* Interactive Split Comparison Card */}
+            {/* Interactive Split Comparison Card with Cyber HUD */}
             <div
               ref={containerRef}
               role="slider"
@@ -313,8 +318,14 @@ export const FutureIce: React.FC = () => {
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              className="relative rounded-3xl overflow-hidden border-2 border-slate-700/80 bg-slate-950 shadow-2xl aspect-[4/3] sm:aspect-square select-none cursor-ew-resize focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="relative rounded-3xl overflow-hidden border-2 border-slate-700/80 bg-slate-950 shadow-2xl aspect-[4/3] sm:aspect-square select-none cursor-ew-resize focus:outline-none focus:ring-2 focus:ring-sky-500 group"
             >
+              {/* Corner Viewfinder Reticles */}
+              <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-white/40 pointer-events-none z-30" />
+              <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-white/40 pointer-events-none z-30" />
+              <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-white/40 pointer-events-none z-30" />
+              <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-white/40 pointer-events-none z-30" />
+
               {/* AFTER (Transformed with Ice) - Background full width */}
               <img
                 src={iceResult.imageUrl}
@@ -338,52 +349,52 @@ export const FutureIce: React.FC = () => {
               </div>
 
               {/* Left Label: Your Photo */}
-              <div className="absolute bottom-3 left-3 z-10 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-slate-700 pointer-events-none text-left">
+              <div className="absolute bottom-3 left-3 z-10 px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md border border-white/15 pointer-events-none text-left shadow-lg">
                 <span className="block text-xs font-bold text-white">Your Photo</span>
-                <span className="block text-[10px] text-slate-300">Current appearance</span>
+                <span className="block text-[10px] text-slate-300 font-mono">Current appearance</span>
               </div>
 
               {/* Right Label: With Ice (Simulated) */}
-              <div className="absolute bottom-3 right-3 z-10 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-red-900/60 pointer-events-none text-right flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-red-950/80 border border-red-500/60 flex items-center justify-center text-red-400 shrink-0">
+              <div className="absolute bottom-3 right-3 z-10 px-3.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md border border-red-500/50 pointer-events-none text-right flex items-center gap-2.5 shadow-lg shadow-red-950/40">
+                <div className="w-5 h-5 rounded-full bg-red-950 border border-red-500/60 flex items-center justify-center text-red-400 shrink-0">
                   <Frown className="w-3.5 h-3.5" />
                 </div>
                 <div>
                   <span className="block text-xs font-bold text-red-300">With Ice (Simulated)</span>
-                  <span className="block text-[10px] text-slate-400">
+                  <span className="block text-[10px] text-slate-400 font-mono">
                     Stage {currentStage} • {currentStageMeta.period}
                   </span>
                 </div>
               </div>
 
-              {/* Draggable Divider Line & Split Handle */}
+              {/* Draggable Laser Divider Line & Split Handle */}
               <div
                 className="absolute top-0 bottom-0 z-20 pointer-events-none"
                 style={{ left: `${splitPosition}%` }}
               >
-                <div className="absolute inset-y-0 -left-px w-0.5 bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
+                <div className="absolute inset-y-0 -left-px w-0.5 bg-gradient-to-b from-sky-300 via-white to-amber-300 shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
                 <div
-                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white text-slate-900 shadow-2xl flex items-center justify-center pointer-events-auto cursor-ew-resize transition-transform ${
-                    isDraggingSplit ? 'scale-110 shadow-sky-500/50' : 'hover:scale-105'
+                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white text-slate-950 shadow-2xl flex items-center justify-center pointer-events-auto cursor-ew-resize transition-transform border-2 border-sky-400 ${
+                    isDraggingSplit ? 'scale-110 shadow-glow-cyan' : 'hover:scale-105'
                   }`}
                   title="Drag left or right to compare"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5 -mr-1 text-slate-800" />
-                  <ChevronRight className="w-3.5 h-3.5 -ml-1 text-slate-800" />
+                  <ChevronLeft className="w-4 h-4 -mr-1 text-slate-900" />
+                  <ChevronRight className="w-4 h-4 -ml-1 text-slate-900" />
                 </div>
               </div>
             </div>
 
             {/* Horizontal Stage Thumbnails Strip (Original, Stage 1, Stage 2, Stage 3) */}
-            <div className="grid grid-cols-4 gap-2 pt-1">
+            <div className="grid grid-cols-4 gap-2.5 pt-1">
               {/* Thumbnail 0: Original Photo */}
               <button
                 type="button"
                 onClick={() => setSplitPosition(100)}
-                className={`relative rounded-xl overflow-hidden border text-left transition-all aspect-[4/3] bg-slate-900 group ${
+                className={`relative rounded-2xl overflow-hidden border text-left transition-all aspect-[4/3] bg-slate-900 group ${
                   splitPosition >= 95
-                    ? 'border-2 border-amber-500 ring-2 ring-amber-500/30 shadow-lg'
-                    : 'border-slate-800 hover:border-slate-600 opacity-80 hover:opacity-100'
+                    ? 'border-2 border-sky-400 ring-2 ring-sky-400/30 shadow-glow-cyan/40 scale-[1.02]'
+                    : 'border-white/10 hover:border-white/30 opacity-75 hover:opacity-100'
                 }`}
                 title="View original baseline appearance"
               >
@@ -392,7 +403,7 @@ export const FutureIce: React.FC = () => {
                   alt="Original"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-1.5 text-center">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-1.5 text-center">
                   <span className="block text-xs font-bold text-white">Original</span>
                 </div>
               </button>
@@ -406,10 +417,10 @@ export const FutureIce: React.FC = () => {
                     key={stg.stage}
                     type="button"
                     onClick={() => handleStageChange(stg.stage)}
-                    className={`relative rounded-xl overflow-hidden border text-left transition-all aspect-[4/3] bg-slate-900 group ${
+                    className={`relative rounded-2xl overflow-hidden border text-left transition-all aspect-[4/3] bg-slate-900 group ${
                       isActive
-                        ? 'border-2 border-amber-500 ring-2 ring-amber-500/30 shadow-lg'
-                        : 'border-slate-800 hover:border-slate-600 opacity-80 hover:opacity-100'
+                        ? 'border-2 border-amber-500 ring-2 ring-amber-500/30 shadow-glow-amber scale-[1.02]'
+                        : 'border-white/10 hover:border-white/30 opacity-75 hover:opacity-100'
                     }`}
                     title={`Switch to Stage ${stg.stage} (${stg.period})`}
                   >
@@ -418,9 +429,9 @@ export const FutureIce: React.FC = () => {
                       alt={stg.label}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-1 text-center">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-1.5 text-center">
                       <span className="block text-[11px] font-bold text-white leading-tight">Stage {stg.stage}</span>
-                      <span className="block text-[9px] text-slate-300 opacity-90">{stg.period}</span>
+                      <span className="block text-[9px] text-slate-300 opacity-90 font-mono">{stg.period}</span>
                     </div>
                   </button>
                 );
@@ -431,7 +442,7 @@ export const FutureIce: React.FC = () => {
           {/* Right Column: Stage Controls & Documented Indicators */}
           <div className="lg:col-span-6 space-y-5">
             {/* Card 1: SELECT TIMELINE STAGE */}
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-4 shadow-xl">
+            <div className="glass-panel rounded-3xl border border-white/10 p-6 space-y-4 shadow-xl">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-sky-400" />
@@ -444,7 +455,8 @@ export const FutureIce: React.FC = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              {/* 3 Interactive Stage Buttons */}
+              <div className="grid grid-cols-3 gap-2.5">
                 {APP_CONFIG.stages.map((stg) => {
                   const isActive = currentStage === stg.stage;
                   return (
@@ -452,23 +464,26 @@ export const FutureIce: React.FC = () => {
                       key={stg.stage}
                       type="button"
                       onClick={() => handleStageChange(stg.stage)}
-                      className={`p-3 rounded-xl border text-center transition-all ${
+                      className={`p-3.5 rounded-2xl border text-center transition-all ${
                         isActive
-                          ? 'bg-amber-950/40 border-2 border-amber-500 text-white shadow-lg shadow-amber-950/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                          ? 'bg-amber-950/50 border-2 border-amber-400 text-white shadow-glow-amber/30 scale-[1.02]'
+                          : 'glass-panel-hover border-white/10 text-slate-400 hover:text-white'
                       }`}
                     >
                       <span className="block text-xs font-bold">Stage {stg.stage}</span>
-                      <span className="block text-[11px] opacity-75 mt-0.5">{stg.period}</span>
+                      <span className="block text-[11px] opacity-80 mt-0.5 font-mono">{stg.period}</span>
                     </button>
                   );
                 })}
               </div>
 
               {/* Simulation Intensity Slider */}
-              <div className="pt-2 space-y-2 border-t border-slate-800/80">
+              <div className="pt-3 space-y-2 border-t border-white/[0.08]">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-medium">Simulation Intensity</span>
+                  <span className="text-slate-300 font-medium flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Simulation Intensity</span>
+                  </span>
                   <span className="font-mono font-bold text-amber-400">{Math.round(sliderVal * 100)}%</span>
                 </div>
                 <input
@@ -485,60 +500,60 @@ export const FutureIce: React.FC = () => {
             </div>
 
             {/* Card 2: DOCUMENTED IMPACT INDICATORS */}
-            <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3.5 shadow-xl">
+            <div className="glass-panel rounded-3xl border border-white/10 p-6 space-y-4 shadow-xl relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
                   <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Documented Impact Indicators</span>
                 </div>
-                <span className="text-xs text-slate-400 font-medium">{currentStageMeta.period}</span>
+                <span className="text-xs text-slate-400 font-mono font-medium">{currentStageMeta.period}</span>
               </div>
 
-              <h2 className="text-lg font-bold text-white">{currentStageMeta.title}</h2>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h2 className="text-xl font-bold text-white tracking-tight">{currentStageMeta.title}</h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 {currentStageMeta.description}
               </p>
 
-              {/* 5 Clinical Bullets with Red Dots */}
+              {/* Clinical Bullets with Glowing Red Beacons */}
               {currentStageMeta.bullets && (
-                <ul className="space-y-1.5 pt-1 text-xs text-slate-300">
+                <ul className="space-y-2 pt-1 text-xs text-slate-300">
                   {currentStageMeta.bullets.map((bullet, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-1.5 shadow-sm shadow-red-500/50" />
-                      <span>{bullet}</span>
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 mt-1 shadow-glow-red" />
+                      <span className="leading-relaxed">{bullet}</span>
                     </li>
                   ))}
                 </ul>
               )}
 
               {/* Important Disclaimer Box */}
-              <div className="rounded-xl bg-amber-950/20 border border-amber-800/40 p-3.5 space-y-1 mt-2">
+              <div className="rounded-2xl bg-amber-950/30 border border-amber-500/40 p-4 space-y-1.5 mt-2">
                 <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
-                  <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <Info className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Important</span>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">
+                <p className="text-[11px] text-slate-300 leading-relaxed font-normal">
                   This is an educational illustration based on research and is NOT a prediction of how you will look. Effects vary greatly between individuals.
                 </p>
               </div>
             </div>
 
             {/* Action Buttons Row: Compare & My Healthy Future */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-1">
               <PrimaryButton
                 size="md"
                 variant="outline"
                 onClick={() => navigate('/compare?pathway=ice')}
                 leftIcon={<SplitSquareVertical className="w-4 h-4 text-sky-400" />}
-                className="w-full sm:flex-1 py-3"
+                className="w-full sm:flex-1 py-3 border-white/20 hover:border-sky-400/50"
               >
-                Compare Before & After
+                Compare Before &amp; After
               </PrimaryButton>
 
               <button
                 type="button"
                 onClick={() => navigate('/healthy-future')}
-                className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-950/40 transition-colors"
+                className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold shadow-glow-emerald/40 transition-all hover:scale-[1.02]"
               >
                 <Sparkles className="w-4 h-4 text-white" />
                 <span>My Healthy Future</span>
@@ -550,7 +565,7 @@ export const FutureIce: React.FC = () => {
 
       {/* Slogan & Ethics Footer */}
       <div className="text-center space-y-2 pt-4">
-        <p className="text-xs font-black tracking-widest text-slate-500 uppercase">
+        <p className="text-xs font-mono tracking-widest text-slate-500 uppercase">
           {APP_CONFIG.slogans.primary} • {APP_CONFIG.slogans.secondary}
         </p>
       </div>

@@ -75,7 +75,7 @@ export const Welcome: React.FC = () => {
               variant="primary"
               onClick={() => navigate('/consent')}
               rightIcon={<ArrowRight className="w-4 h-4" />}
-              className="w-full sm:w-auto px-8 py-3.5 text-sm uppercase tracking-wider font-semibold bg-white text-slate-950 hover:bg-slate-200 border-0 shadow-lg shadow-white/5"
+              className="w-full sm:w-auto px-8 py-3.5 text-sm uppercase tracking-wider font-semibold bg-white text-slate-950 hover:bg-slate-200 border-0 shadow-lg shadow-white/5 hover:shadow-glow-cyan transition-all"
               aria-label="Start Prevention Experience"
             >
               Explore your future
@@ -85,11 +85,77 @@ export const Welcome: React.FC = () => {
               size="lg"
               variant="outline"
               onClick={scrollToRisks}
-              className="w-full sm:w-auto px-8 py-3.5 text-sm uppercase tracking-wider font-semibold border-white/20 text-slate-300 hover:text-white hover:border-white/40"
+              className="w-full sm:w-auto px-8 py-3.5 text-sm uppercase tracking-wider font-semibold border-white/20 text-slate-300 hover:text-white hover:border-white/40 hover:bg-white/[0.04] transition-all"
               aria-label="Understand the risks: Learn more"
             >
               Understand the risks
             </PrimaryButton>
+          </div>
+
+          {/* Interactive Live Hologram Preview Mockup */}
+          <div className="pt-8 max-w-xl mx-auto w-full">
+            <div className="relative rounded-2xl border border-white/15 bg-slate-950/80 p-4 shadow-2xl backdrop-blur-xl overflow-hidden group">
+              {/* Animated Laser Scanline */}
+              <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent scan-laser z-20 pointer-events-none shadow-[0_0_12px_#38bdf8]" />
+
+              {/* HUD Corner Reticles */}
+              <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-sky-400/80 pointer-events-none z-10" />
+              <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-sky-400/80 pointer-events-none z-10" />
+              <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-sky-400/80 pointer-events-none z-10" />
+              <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-sky-400/80 pointer-events-none z-10" />
+
+              {/* HUD Header */}
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-white/10 pb-2.5 mb-3">
+                <span className="flex items-center gap-1.5 text-sky-400 font-semibold">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-400" />
+                  </span>
+                  <span>NEO HUD · Visual Transformation Matrix</span>
+                </span>
+                <span className="text-slate-500 hidden sm:inline">100% Identity Anchored</span>
+              </div>
+
+              {/* Dual Visual Portrait Comparison Preview */}
+              <div className="grid grid-cols-2 gap-3 relative rounded-xl overflow-hidden">
+                {/* Left: Authentic Baseline */}
+                <div className="relative aspect-square rounded-lg overflow-hidden border border-white/10 bg-slate-900">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950 text-slate-300 p-4 text-center">
+                    <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-2 text-2xl font-light">
+                      A
+                    </div>
+                    <span className="text-xs font-semibold text-white">Original Portrait</span>
+                    <span className="text-[10px] text-slate-400 font-mono">Consented Selfie / Avatar</span>
+                  </div>
+                  <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur border border-white/10 text-[9px] font-mono text-slate-300">
+                    Baseline
+                  </div>
+                </div>
+
+                {/* Right: AI Synthesis Preview */}
+                <div className="relative aspect-square rounded-lg overflow-hidden border border-sky-500/30 bg-slate-900 shadow-glow-cyan">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-sky-950/40 to-slate-950 text-sky-200 p-4 text-center">
+                    <div className="w-16 h-16 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center mb-2 text-sky-300">
+                      <Sparkles className="w-8 h-8 animate-pulse" />
+                    </div>
+                    <span className="text-xs font-semibold text-white">Simulated Projection</span>
+                    <span className="text-[10px] text-sky-300/80 font-mono">Generative Physiological AI</span>
+                  </div>
+                  <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded bg-sky-950/90 backdrop-blur border border-sky-400/40 text-[9px] font-mono text-sky-300">
+                    Educational
+                  </div>
+                </div>
+              </div>
+
+              {/* HUD Footer Telemetry */}
+              <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span className="text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                  Volatile Processing (Zero Disk Storage)
+                </span>
+                <span className="text-slate-500">FastAPI / Diffusers Pipeline</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -132,59 +198,59 @@ export const Welcome: React.FC = () => {
           </p>
         </div>
 
-        {/* 4 Minimalist Editorial Items with Thin Dividers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 border-t border-white/10 pt-10">
+        {/* 4 Minimalist Editorial Items with Glowing Interactive Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
           {/* Item 1: Mind */}
-          <div className="space-y-3 pb-8 md:pb-0 border-b md:border-b-0 border-white/[0.06]">
+          <div className="glass-panel glass-panel-hover p-6 rounded-2xl border border-white/10 space-y-3 group">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/[0.04] text-sky-400">
+              <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:scale-110 group-hover:shadow-glow-cyan transition-all duration-300">
                 <Brain className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-medium text-white tracking-tight">Mind</h3>
+              <h3 className="text-xl font-medium text-white tracking-tight">Mind</h3>
             </div>
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed pl-11">
+            <p className="text-sm text-slate-400 leading-relaxed font-normal">
               It can affect sleep, mood, concentration, and mental wellbeing, sometimes triggering
               paranoia, severe insomnia, or persistent cognitive fatigue.
             </p>
           </div>
 
           {/* Item 2: Body */}
-          <div className="space-y-3 pb-8 md:pb-0 border-b md:border-b-0 border-white/[0.06]">
+          <div className="glass-panel glass-panel-hover p-6 rounded-2xl border border-white/10 space-y-3 group">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/[0.04] text-sky-400">
+              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 group-hover:scale-110 group-hover:shadow-glow-red transition-all duration-300">
                 <Activity className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-medium text-white tracking-tight">Body</h3>
+              <h3 className="text-xl font-medium text-white tracking-tight">Body</h3>
             </div>
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed pl-11">
+            <p className="text-sm text-slate-400 leading-relaxed font-normal">
               It can increase heart rate and blood pressure and contribute to serious health
               complications, vascular stress, and accelerated biological wear.
             </p>
           </div>
 
           {/* Item 3: Connections */}
-          <div className="space-y-3 pb-8 md:pb-0 border-b md:border-b-0 border-white/[0.06]">
+          <div className="glass-panel glass-panel-hover p-6 rounded-2xl border border-white/10 space-y-3 group">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/[0.04] text-sky-400">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-110 group-hover:shadow-glow-amber transition-all duration-300">
                 <Users className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-medium text-white tracking-tight">Connections</h3>
+              <h3 className="text-xl font-medium text-white tracking-tight">Connections</h3>
             </div>
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed pl-11">
+            <p className="text-sm text-slate-400 leading-relaxed font-normal">
               Substance use can strain relationships, erode trust with loved ones, and undermine
               daily commitments with school, sport, and work.
             </p>
           </div>
 
           {/* Item 4: Future */}
-          <div className="space-y-3">
+          <div className="glass-panel glass-panel-hover p-6 rounded-2xl border border-white/10 space-y-3 group">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/[0.04] text-sky-400">
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110 group-hover:shadow-glow-emerald transition-all duration-300">
                 <Compass className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-medium text-white tracking-tight">Future</h3>
+              <h3 className="text-xl font-medium text-white tracking-tight">Future</h3>
             </div>
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed pl-11">
+            <p className="text-sm text-slate-400 leading-relaxed font-normal">
               Dependence and health consequences can make personal and academic goals harder to
               pursue, taking focus away from dreams and passions.
             </p>
@@ -216,25 +282,32 @@ export const Welcome: React.FC = () => {
           {/* Two Exploration Pathways */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Pathway 1: Explore the Risks */}
-            <div className="relative group rounded-2xl border border-white/10 bg-white/[0.02] p-8 space-y-6 hover:border-white/20 transition-all duration-300 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300">
-                  <Activity className="w-5 h-5" />
+            <div className="relative group rounded-3xl glass-panel p-8 space-y-6 hover:border-red-500/40 hover:shadow-glow-red hover:bg-red-950/[0.08] transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-colors pointer-events-none" />
+
+              <div className="space-y-4 relative z-10">
+                <div className="flex items-center justify-between">
+                  <div className="w-11 h-11 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-red-300/80 border border-red-500/20 px-2 py-0.5 rounded">
+                    Risk Simulation
+                  </span>
                 </div>
-                <h3 className="text-2xl font-light tracking-tight text-white">
+                <h3 className="text-2xl font-light tracking-tight text-white group-hover:text-red-200 transition-colors">
                   Explore the risks
                 </h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-sm text-slate-400 leading-relaxed font-normal">
                   View an educational, progressive illustration of physical and facial wear associated
                   with chronic crystal methamphetamine use across multiple timeline scenarios.
                 </p>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 relative z-10 border-t border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => navigate('/consent?pathway=ice')}
-                  className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-white hover:text-sky-300 group-hover:translate-x-1 transition-all"
+                  className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-white hover:text-red-300 group-hover:translate-x-1 transition-all"
                 >
                   <span>Explore this path</span>
                   <ArrowRight className="w-4 h-4" />
@@ -243,25 +316,32 @@ export const Welcome: React.FC = () => {
             </div>
 
             {/* Pathway 2: Explore a Healthier Path */}
-            <div className="relative group rounded-2xl border border-white/10 bg-white/[0.02] p-8 space-y-6 hover:border-white/20 transition-all duration-300 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
-                  <Sparkles className="w-5 h-5" />
+            <div className="relative group rounded-3xl glass-panel p-8 space-y-6 hover:border-emerald-500/40 hover:shadow-glow-emerald hover:bg-emerald-950/[0.08] transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors pointer-events-none" />
+
+              <div className="space-y-4 relative z-10">
+                <div className="flex items-center justify-between">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-300/80 border border-emerald-500/20 px-2 py-0.5 rounded">
+                    Vitality Pathway
+                  </span>
                 </div>
-                <h3 className="text-2xl font-light tracking-tight text-white">
+                <h3 className="text-2xl font-light tracking-tight text-white group-hover:text-emerald-200 transition-colors">
                   Explore a healthier path
                 </h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-sm text-slate-400 leading-relaxed font-normal">
                   Discover how healthy choices, positive sleep, nutrition, and self-care preserve
                   natural facial radiance, energy, sports capability, and future opportunities.
                 </p>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 relative z-10 border-t border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => navigate('/consent?pathway=healthy')}
-                  className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-sky-400 hover:text-sky-300 group-hover:translate-x-1 transition-all"
+                  className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-emerald-400 hover:text-emerald-300 group-hover:translate-x-1 transition-all"
                 >
                   <span>Explore healthy future</span>
                   <ArrowRight className="w-4 h-4" />

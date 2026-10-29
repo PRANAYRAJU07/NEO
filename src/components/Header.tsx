@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, HeartHandshake, RotateCcw, Cpu, Menu, X } from 'lucide-react';
+import { HeartHandshake, RotateCcw, Cpu, Menu, X } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { APP_CONFIG } from '../config/appConfig';
 import { EngineInfoModal } from './EngineInfoModal';
@@ -36,12 +36,12 @@ export const Header: React.FC = () => {
             to="/"
             className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg p-1"
           >
-            <div className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.04] flex items-center justify-center text-white font-mono text-sm font-semibold tracking-tighter group-hover:border-sky-400 transition-colors">
+            <div className="w-9 h-9 rounded-xl border border-white/20 bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center text-white font-mono text-sm font-bold tracking-tighter group-hover:border-sky-400 group-hover:shadow-glow-cyan transition-all duration-300">
               N
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-base tracking-tight text-white group-hover:text-slate-200 transition-colors">
+                <span className="font-semibold text-base tracking-tight text-white group-hover:text-sky-300 transition-colors">
                   NEO
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded border border-white/10 text-slate-400 font-mono tracking-wider uppercase hidden sm:inline-block">
@@ -60,19 +60,22 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowEngineModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 hover:text-white border border-white/10 hover:border-white/20 bg-white/[0.02] transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300 hover:text-white border border-white/10 hover:border-sky-400/40 bg-white/[0.03] hover:shadow-glow-cyan transition-all focus:outline-none focus:ring-2 focus:ring-sky-400"
               title="Click to view generative AI engine provenance & privacy architecture"
             >
               <Cpu className="w-3.5 h-3.5 text-sky-400" />
               <span>{engineInfo.type === 'server-gpu' ? 'GPU AI Engine' : 'AI Engine Info'}</span>
             </button>
 
-            {/* Privacy indicator */}
+            {/* Privacy indicator with live beacon */}
             <div
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border border-white/10 bg-white/[0.02] text-slate-400"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono border border-emerald-500/20 bg-emerald-950/20 text-emerald-300"
               title="Zero uploads: selfies never leave this device"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
               <span>Zero-Upload Guarantee</span>
             </div>
 

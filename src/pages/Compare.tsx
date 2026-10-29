@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { SplitSquareVertical, ArrowLeft, Sparkles, Activity } from 'lucide-react';
+import { SplitSquareVertical, ArrowLeft, Sparkles, Activity, LifeBuoy } from 'lucide-react';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { EducationalDisclaimer } from '../components/EducationalDisclaimer';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -46,30 +46,30 @@ export const Compare: React.FC = () => {
   const currentStageMeta = APP_CONFIG.stages.find((s) => s.stage === currentStage) || APP_CONFIG.stages[0]!;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-10 space-y-8 animate-fade-in">
+    <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-10 space-y-8 animate-fade-in relative">
       {/* Title */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-950/60 border border-sky-800/60 text-sky-300 text-xs font-semibold">
-          <SplitSquareVertical className="w-3.5 h-3.5" />
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-sky-950/70 border border-sky-500/40 text-sky-300 text-xs font-mono font-semibold tracking-wider shadow-glow-cyan/20 animate-pulse-slow">
+          <SplitSquareVertical className="w-3.5 h-3.5 text-sky-400" />
           <span>Interactive Comparative Analysis</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
-          Before & After Comparison
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+          Before &amp; After Comparison
         </h1>
-        <p className="text-sm text-slate-300 max-w-lg mx-auto">
+        <p className="text-sm sm:text-base text-slate-300 max-w-lg mx-auto leading-relaxed">
           Drag the center handle or use the keyboard arrows to compare your baseline photo with simulated future outcomes.
         </p>
       </div>
 
       {/* Pathway Switcher Tabs */}
       <div className="flex items-center justify-center">
-        <div className="inline-flex p-1.5 rounded-2xl bg-slate-900 border border-slate-800 gap-2">
+        <div className="inline-flex p-1.5 rounded-2xl glass-panel border border-white/10 gap-2">
           <button
             type="button"
             onClick={() => setActivePathway('ice')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activePathway === 'ice'
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-950/40'
+                ? 'bg-amber-600 text-white shadow-glow-amber/40 scale-[1.02]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -80,9 +80,9 @@ export const Compare: React.FC = () => {
           <button
             type="button"
             onClick={() => setActivePathway('healthy')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activePathway === 'healthy'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/40'
+                ? 'bg-emerald-600 text-white shadow-glow-emerald/40 scale-[1.02]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -112,13 +112,13 @@ export const Compare: React.FC = () => {
           />
 
           {/* Context note below slider */}
-          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 text-center max-w-xl mx-auto space-y-1">
-            <p className="text-xs font-semibold text-slate-200">
+          <div className="glass-panel rounded-2xl border border-white/10 p-5 text-center max-w-xl mx-auto space-y-1.5 shadow-lg">
+            <p className="text-xs sm:text-sm font-semibold text-slate-200">
               {activePathway === 'ice'
                 ? `Illustrating Stage ${currentStage} consequences: ${currentStageMeta.title}`
                 : 'Illustrating natural youth vitality, skin elasticity, and radiant wellness.'}
             </p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-400 font-mono">
               All visuals are educational simulations. Biological responses vary.
             </p>
           </div>
@@ -131,6 +131,7 @@ export const Compare: React.FC = () => {
           variant="outline"
           onClick={() => navigate(activePathway === 'ice' ? '/future-ice' : '/healthy-future')}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="border-white/20 hover:border-sky-400/50"
         >
           Return to {activePathway === 'ice' ? 'Ice Pathway' : 'Healthy Pathway'}
         </PrimaryButton>
@@ -138,8 +139,10 @@ export const Compare: React.FC = () => {
         <PrimaryButton
           variant="secondary"
           onClick={() => navigate('/help')}
+          leftIcon={<LifeBuoy className="w-4 h-4 text-sky-400" />}
+          className="border-white/15 hover:border-sky-400/40"
         >
-          Get Help & Information
+          Get Help &amp; Information
         </PrimaryButton>
       </div>
     </div>
